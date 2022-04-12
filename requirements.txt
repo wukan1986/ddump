@@ -1,0 +1,5 @@
+loguru
+pandas
+pyarrow
+PyMySQL
+SQLAlchemy>=1.4
