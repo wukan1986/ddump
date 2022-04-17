@@ -20,7 +20,7 @@ import time
 import pandas as pd
 
 from ddump.api.dump import Dump__date
-from examples.tushare_api.config import DATA_ROOT, pro
+from examples.tushare.config import DATA_ROOT, pro
 
 if __name__ == '__main__':
     end = f"{pd.to_datetime('today'):%Y-%m-%d}"

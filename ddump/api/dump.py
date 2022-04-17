@@ -90,6 +90,22 @@ class Dump:
         except TypeError as e:
             self.file_path = None
 
+    def set_file_path(self, file_name):
+        """强行设置保存文件路径
+
+        部分接口没有参数，每天下载都只能下载到最新数据，需要按天保存。
+        无法指定日期参数，又要按日期保存。所以提供一个强行设置保存路径的功能。
+
+        需在set_parameters之后，exists之前调用
+
+        Parameters
+        ----------
+        file_name: str
+            文件名
+
+        """
+        self.file_path = self.path / f'{file_name}{FILE_SUFFIX}'
+
     def exists(self, timeout):
         """检查文件是否存在，防止重复下载
 
