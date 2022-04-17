@@ -42,5 +42,6 @@ if __name__ == '__main__':
             if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 3):
                 d.download()
                 d.save(save_empty=True, save_func=save_funcs.get(func_name, None))
-                if i % 10 == 0:
+                # 这个地方按情况调整
+                if i % 10 == 1:
                     time.sleep(10)

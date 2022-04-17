@@ -9,6 +9,27 @@
     1. 第一组参数，全量下单时所用到的`索引字段名`str_key1、`唯一ID字段名`str_id1、`修改时间字段名`str_dt1，此处的`索引字段名`用表中索引，可以加快转存速度
     2. 第二组参数，增量下单时所用到的`索引字段名`str_key2、`唯一ID字段名`str_id2、`修改时间字段名`str_dt2，此处`索引字段名`用的`修改时间字段名`一样的值
     3. 要转存的表名tbl_name、数据保存的根目录path，将在根目录下生成以表名加后缀的文件夹
+    
+```python
+from ddump.db.dump import continue_download3
+from ddump.db.tool import DbTool
+from examples.tushare_db.config import DATA_ROOT, TUSHARE_URL
+
+if __name__ == '__main__':
+    db = DbTool(url=TUSHARE_URL)
+
+    for tbl_name, str_key1 in [
+        ('MKT_STK_DPRICE', 'TRADE_DATE'),
+        ('MKT_STK_SUSPEND_D', 'SUSPEND_DATE'),
+
+    ]:
+        continue_download3(db, tbl_name, DATA_ROOT,
+                           str_key1=str_key1, str_id1='ID', str_dt1='UPDATE_TIME',
+                           str_key2='UPDATE_TIME', str_id2='ID', str_dt2='UPDATE_TIME',
+                           limit=20000,
+                           merge=True)
+
+```
 
 ## 数据增量同步
 1. 历史全量

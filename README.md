@@ -12,10 +12,16 @@ ddump(Data Dump)数据转存工具。主要解决以下问题：
 2. 金融类数据特殊，并不需要随机访问。全量加载或按日期加载都是更常用的方法
 3. 数据备份分享时，文件更方便
 
-## 安装
-> pip install ddump -i https://pypi.tuna.tsinghua.edu.cn/simple # 国内镜像下载
+## 为何采用Parquet文件格式
+1. csv格式，文本格式，读写慢，容易丢失精度
+2. pickle格式，只能在Python下使用
+3. HDF5格式，强大灵活，跨语言
+4. parquet格式，列式存储，支持直接读取文件夹。跨语言，常用于大数据处理
 
-> pip install ddump -i https://pypi.org/simple # 国外官方源下载
+## 安装
+> pip install ddump -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade # 国内镜像下载
+
+> pip install ddump -i https://pypi.org/simple --upgrade # 国外官方源下载
 
 ## 开发
 > pip install -e .
