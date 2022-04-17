@@ -19,7 +19,7 @@ save_funcs = {
 if __name__ == '__main__':
     end = f"{pd.to_datetime('today'):%Y-%m-%d}"
     # 加载交易日历
-    trading_day = pd.read_parquet(DATA_ROOT / 'tool_trade_date_hist_sina' / f'.parquet')
+    trading_day = pd.read_parquet(DATA_ROOT / 'tool_trade_date_hist_sina' / f'calendar.parquet')
     trading_day = trading_day['trade_date']
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
