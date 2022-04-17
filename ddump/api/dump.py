@@ -140,7 +140,7 @@ class Dump:
         logger.info('数据量 {} {} {} {}', len(self.df), self.func_name, self.args, self.kwargs)
         return self.df
 
-    def save(self, save_empty):
+    def save(self, save_empty, save_func=None):
         """保存数据
 
         Parameters
@@ -148,17 +148,22 @@ class Dump:
         save_empty:
             空DataFrame是否保存。全量下载前期不保存，后期得保存，防重复下载
             读取文件夹时，只要前面的文件不为emtpy就能正常打开
+        save_func：
+            保存前的处理函数，特殊处理用
 
         """
-        if self.df is None:
+        df = self.df
+        if df is None:
             raise Exception('需要在download中设置数据到self.df后才能保存')
-        if self.df.empty:
+        if df.empty:
             if not save_empty:
                 return
+        if save_func is not None:
+            df = save_func(df)
 
         self.path.mkdir(parents=True, exist_ok=True)
         # 保存
-        self.df.to_parquet(self.file_path, compression='gzip')
+        df.to_parquet(self.file_path, compression='gzip')
 
     def load(self):
         """加载数据"""
@@ -209,9 +214,9 @@ class Dump__start__end(Dump):
         Parameters
         ----------
         file_timeout: int
-            文件超时
+            文件超时。小于此时间，认为文件已经存在，不用重复下载
         data_timeout: int
-            数据超时
+            数据超时。大于此时间，认为是老数据，没有必要重新下载
 
         """
         if Dump.exists(self, file_timeout):

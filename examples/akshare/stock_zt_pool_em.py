@@ -1,7 +1,20 @@
+import time
+
 import pandas as pd
 
 from ddump.api.dump import Dump__date
 from examples.akshare.config import DATA_ROOT, ak
+
+
+def save_func_stock_zt_pool_sub_new_em(df):
+    """stock_zt_pool_sub_new_em中 涨停价 需要修正，否则转parquet失败"""
+    df['涨停价'] = pd.to_numeric(df['涨停价'], errors="coerce")
+    return df
+
+
+save_funcs = {
+    'stock_zt_pool_sub_new_em': save_func_stock_zt_pool_sub_new_em,
+}
 
 if __name__ == '__main__':
     end = f"{pd.to_datetime('today'):%Y-%m-%d}"
@@ -24,8 +37,10 @@ if __name__ == '__main__':
     ]:
         path = DATA_ROOT / func_name
         d = Dump__date(ak, path, 'date')
-        for date in trading_day:
+        for i, date in enumerate(trading_day):
             d.set_parameters(func_name, date=f'{date:%Y%m%d}')
-            if not d.exists(file_timeout=3600 * 1, data_timeout=86400 * 3):
+            if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 3):
                 d.download()
-                d.save(save_empty=True)
+                d.save(save_empty=True, save_func=save_funcs.get(func_name, None))
+                if i % 10 == 0:
+                    time.sleep(10)
