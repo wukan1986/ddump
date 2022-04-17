@@ -1,4 +1,4 @@
-from examples.tushare_api.config import DATA_ROOT, pro
+from examples.tushare.config import DATA_ROOT, pro
 from ddump.api.dump import Dump
 
 if __name__ == '__main__':

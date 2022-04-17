@@ -1,6 +1,6 @@
 import pandas as pd
 
-from examples.tushare_api.config import DATA_ROOT, pro
+from examples.tushare.config import DATA_ROOT, pro
 from ddump.api.dump import Dump__start__end
 
 """
