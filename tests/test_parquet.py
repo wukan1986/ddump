@@ -1,3 +1,5 @@
+import pathlib
+
 import pandas as pd
 import pyarrow as pa
 
@@ -16,3 +18,8 @@ df.head(0).to_parquet('b/1.parquet')  # empty dateframe
 df.head(0).to_parquet('b/2.parquet')  # empty dateframe
 df.to_parquet('b/3.parquet')
 pd.read_parquet('b')
+
+# 另一种加载文件的方法
+import pandas as pd
+
+df = pd.concat([pd.read_parquet(_) for _ in pathlib.Path('.').glob('20220*')])

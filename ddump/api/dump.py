@@ -153,6 +153,9 @@ class Dump:
         logger.info('下载 {} {} {}', self.func_name, self.args, self.kwargs)
         api = getattr(self.api, self.func_name)
         self.df = api(*self.args, **self.kwargs)
+        # 部分API返回为None
+        if self.df is None:
+            self.df = pd.DataFrame()
         logger.info('数据量 {} {} {} {}', len(self.df), self.func_name, self.args, self.kwargs)
         return self.df
 
@@ -171,11 +174,15 @@ class Dump:
         df = self.df
         if df is None:
             raise Exception('需要在download中设置数据到self.df后才能保存')
+
         if df.empty:
+            # 丢弃表头，防止concat时float字段被改成了object
+            df = pd.DataFrame()
             if not save_empty:
                 return
-        if save_func is not None:
-            df = save_func(df)
+        else:
+            if save_func is not None:
+                df = save_func(df)
 
         self.path.mkdir(parents=True, exist_ok=True)
         # 保存

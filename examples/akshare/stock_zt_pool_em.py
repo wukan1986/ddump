@@ -17,7 +17,7 @@ save_funcs = {
 }
 
 if __name__ == '__main__':
-    end = f"{pd.to_datetime('today'):%Y-%m-%d}"
+    end = f"{pd.to_datetime('today') - pd.Timedelta(hours=15, minutes=30):%Y-%m-%d}"
     # 加载交易日历
     trading_day = pd.read_parquet(DATA_ROOT / 'tool_trade_date_hist_sina' / f'calendar.parquet')
     trading_day = trading_day['trade_date']
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # 过滤交易日
     # trading_day = trading_day['2020-01-01':'2020-02-01']
     # trading_day = trading_day['2012-02-27':'2012-02-29']
-    trading_day = trading_day['2022-01-01':end]
+    trading_day = trading_day['2022-04-01':end]
 
     for func_name in [
         "stock_zt_pool_em",  # 涨停板行情-涨停股池
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         d = Dump__date(ak, path, 'date')
         for i, date in enumerate(trading_day):
             d.set_parameters(func_name, date=f'{date:%Y%m%d}')
-            if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 3):
+            if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 2):
                 d.download()
                 d.save(save_empty=True, save_func=save_funcs.get(func_name, None))
                 # 这个地方按情况调整
