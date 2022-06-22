@@ -167,7 +167,7 @@ class Dump:
         save_empty:
             空DataFrame是否保存。全量下载前期不保存，后期得保存，防重复下载
             读取文件夹时，只要前面的文件不为emtpy就能正常打开
-        save_func：
+        save_func:
             保存前的处理函数，特殊处理用
 
         """
