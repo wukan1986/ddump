@@ -23,6 +23,7 @@ setuptools.setup(
         'pyarrow',
         'PyMySQL',
         'SQLAlchemy>=1.4',
+        'tenacity',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

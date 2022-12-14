@@ -65,20 +65,22 @@ if __name__ == '__main__':
     d1 = Dump__start__end(jq, path1, 'start_date', 'end_date')
     d2 = Dump__start__end(jq, path2, 'start_date', 'end_date')
 
-    # 前半段，按周查，这样能快一些
-    end = pd.to_datetime('2022-06-06')
-    start = pd.to_datetime('2020-01-01')
-    for dr in pd.date_range(start=start, end=end, freq='W'):
-        start_date = dr - pd.Timedelta(days=6)
-        end_date = dr
+    if True:
+        # 前半段，按周查，这样能快一些
+        end = pd.to_datetime('2022-10-16')
+        start = pd.to_datetime('2022-05-23')
+        for dr in pd.date_range(start=start, end=end, freq='W'):
+            start_date = dr - pd.Timedelta(days=6)
+            end_date = dr
 
-        do_it(d1, d2, start_date, end_date, universe, func_name)
+            do_it(d1, d2, start_date, end_date, universe, func_name)
 
-    # 每日更新，按交易日查
-    end = pd.to_datetime('2022-06-07')
-    start = pd.to_datetime('2022-06-06')
-    for dr in pd.date_range(start=start, end=end, freq='B'):
-        start_date = dr
-        end_date = dr
+    if False:
+        # 每日更新，按交易日查
+        end = pd.to_datetime('2022-07-20')
+        start = pd.to_datetime('2022-07-18')
+        for dr in pd.date_range(start=start, end=end, freq='B'):
+            start_date = dr
+            end_date = dr
 
-        do_it(d1, d2, start_date, end_date, universe, func_name)
+            do_it(d1, d2, start_date, end_date, universe, func_name)

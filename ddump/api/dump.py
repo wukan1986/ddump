@@ -90,22 +90,6 @@ class Dump:
         except TypeError as e:
             self.file_path = None
 
-    def set_file_path(self, file_name):
-        """强行设置保存文件路径
-
-        部分接口没有参数，每天下载都只能下载到最新数据，需要按天保存。
-        无法指定日期参数，又要按日期保存。所以提供一个强行设置保存路径的功能。
-
-        需在set_parameters之后，exists之前调用
-
-        Parameters
-        ----------
-        file_name: str
-            文件名
-
-        """
-        self.file_path = self.path / f'{file_name}{FILE_SUFFIX}'
-
     def exists(self, timeout):
         """检查文件是否存在，防止重复下载
 
@@ -136,13 +120,15 @@ class Dump:
             else:
                 return False
 
-    def download(self):
+    def download(self, kw=None):
         """下载动作。每个API的函数与参数不同，需定制重载
 
         Returns
         -------
         pd.DataFrame
             查询的数据
+        kw:
+            需要传送的参数。None表示全传
 
         Notes
         -----
@@ -152,14 +138,19 @@ class Dump:
         """
         logger.info('下载 {} {} {}', self.func_name, self.args, self.kwargs)
         api = getattr(self.api, self.func_name)
-        self.df = api(*self.args, **self.kwargs)
+        if kw is None:
+            self.df = api(*self.args, **self.kwargs)
+        else:
+            # 只有约定的键才做为参数
+            _kwargs = {k: v for k, v in self.kwargs.items() if k in kw}
+            self.df = api(*self.args, **_kwargs)
         # 部分API返回为None
         if self.df is None:
             self.df = pd.DataFrame()
         logger.info('数据量 {} {} {} {}', len(self.df), self.func_name, self.args, self.kwargs)
         return self.df
 
-    def save(self, save_empty, save_func=None):
+    def save(self, save_empty, pre_save=None):
         """保存数据
 
         Parameters
@@ -167,7 +158,7 @@ class Dump:
         save_empty:
             空DataFrame是否保存。全量下载前期不保存，后期得保存，防重复下载
             读取文件夹时，只要前面的文件不为emtpy就能正常打开
-        save_func:
+        pre_save:
             保存前的处理函数，特殊处理用
 
         """
@@ -181,8 +172,8 @@ class Dump:
             if not save_empty:
                 return
         else:
-            if save_func is not None:
-                df = save_func(df)
+            if pre_save is not None:
+                df = pre_save(df)
 
         self.path.mkdir(parents=True, exist_ok=True)
         # 保存
@@ -191,7 +182,7 @@ class Dump:
     def load(self):
         """加载数据"""
         if self.file_path is None:
-            raise Exception('请调用set_parameters, 帮助设置self.file_path')
+            raise Exception('请调用set_parameters, 帮助设置file_path')
         self.df = pd.read_parquet(self.file_path)
         return self.df
 
