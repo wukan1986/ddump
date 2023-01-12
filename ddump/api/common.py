@@ -102,6 +102,7 @@ def get_last_file(path, suffix):
     id
 
     """
+    path = pathlib.Path(path)
     files = list(path.glob(f'*{suffix}'))
     if len(files) == 0:
         return None

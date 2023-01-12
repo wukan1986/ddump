@@ -86,9 +86,13 @@ class Dump:
         self.kwargs = kwargs
         # 生成写入文件名
         try:
-            self.file_path = self.path / f'{START_SEP_END.join([self.kwargs[k] for k in self.file_names])}{FILE_SUFFIX}'
+            filename = f'{START_SEP_END.join([self.kwargs[k] for k in self.file_names])}{FILE_SUFFIX}'
+            # 处理路径中不能使用的字符
+            filename = filename.translate(str.maketrans('\\/:*?"<>|', '_' * 9))
+            self.file_path = self.path / filename
         except TypeError as e:
             self.file_path = None
+        pass
 
     def exists(self, timeout):
         """检查文件是否存在，防止重复下载
@@ -147,19 +151,21 @@ class Dump:
         # 部分API返回为None
         if self.df is None:
             self.df = pd.DataFrame()
-        logger.info('数据量 {} {} {} {}', len(self.df), self.func_name, self.args, self.kwargs)
+        # logger.info('数据量 {} {} {} {}', len(self.df), self.func_name, self.args, self.kwargs)
         return self.df
 
-    def save(self, save_empty, pre_save=None):
+    def save(self, save_empty, pre_save=None, pre_save_kwargs={}):
         """保存数据
 
         Parameters
         ----------
-        save_empty:
+        save_empty: bool
             空DataFrame是否保存。全量下载前期不保存，后期得保存，防重复下载
             读取文件夹时，只要前面的文件不为emtpy就能正常打开
-        pre_save:
+        pre_save: func
             保存前的处理函数，特殊处理用
+        pre_save_kwargs: dict
+            保存存前处理函数的参数
 
         """
         df = self.df
@@ -173,10 +179,11 @@ class Dump:
                 return
         else:
             if pre_save is not None:
-                df = pre_save(df)
+                df = pre_save(df, **pre_save_kwargs)
 
         self.path.mkdir(parents=True, exist_ok=True)
         # 保存
+        logger.info('保存 {} {} {}', len(self.df), self.func_name, self.file_path)
         df.to_parquet(self.file_path, compression='gzip')
 
     def load(self):

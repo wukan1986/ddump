@@ -31,7 +31,7 @@ def main():
     # 过滤交易日
     # trading_day = trading_day['2020-01-01':'2020-02-01']
     # trading_day = trading_day['2012-02-27':'2012-02-29']
-    trading_day = trading_day['2022-01-01':end]
+    trading_day = trading_day['2022-12-01':end]
 
     for func_name in [
         "stock_zt_pool_em",  # 涨停板行情-涨停股池

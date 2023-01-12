@@ -28,7 +28,7 @@ def do_get_price(d, start_date, end_date, universe, fields, fq):
     d.set_parameters('get_price',
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist(), fq=fq, panel=False, fields=fields)
-    if not d.exists(file_timeout=86400 * 3, data_timeout=86400 * 10):
+    if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 3):
         d.download()
         d.save(save_empty=True)
 
@@ -41,7 +41,7 @@ def do_get_extras(d, start_date, end_date, universe, info):
                      info=info,
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security_list=symbols.index.tolist(), df=True)
-    if not d.exists(file_timeout=86400 * 3, data_timeout=86400 * 10):
+    if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 3):
         d.download()
         d.save(save_empty=True)
 
@@ -59,24 +59,15 @@ if __name__ == '__main__':
     d2 = Dump__start__end(jq, path2, 'start_date', 'end_date')
     d3 = Dump__start__end(jq, path3, 'start_date', 'end_date')
 
-    if True:
-        # 前半段，按周查，这样能快一些
-        end = pd.to_datetime('2022-12-25')  # 星期日
-        start = pd.to_datetime('2022-10-03')  # 星期一
-        for dr in pd.date_range(start=start, end=end, freq='W'):
-            start_date = dr - pd.Timedelta(days=6)
-            end_date = dr
+    # 前半段，按周查，这样能快一些
+    end = pd.to_datetime('2023-01-15')  # 星期日
+    # 下周，由date_range调到本周日
+    end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=6)
+    start = pd.to_datetime('2022-12-12')  # 星期一
+    for dr in pd.date_range(start=start, end=end, freq='W'):
+        start_date = dr - pd.Timedelta(days=6)
+        end_date = dr
 
-            do_get_price(d1, start_date, end_date, universe, fields1, fq1)
-            do_get_price(d2, start_date, end_date, universe, fields2, fq2)
-            do_get_extras(d3, start_date, end_date, universe, 'is_st')
-
-    # if False:
-    #     # 每日更新，按交易日查
-    #     end = pd.to_datetime('2022-07-20')
-    #     start = pd.to_datetime('2022-07-18')
-    #     for dr in pd.date_range(start=start, end=end, freq='B'):
-    #         start_date = dr
-    #         end_date = dr
-    #
-    #         do_it(d1, d2, start_date, end_date, universe, func_name)
+        do_get_price(d1, start_date, end_date, universe, fields1, fq1)
+        do_get_price(d2, start_date, end_date, universe, fields2, fq2)
+        do_get_extras(d3, start_date, end_date, universe, 'is_st')

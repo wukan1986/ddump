@@ -1,5 +1,5 @@
 """
-
+板块变动很小，可以每周只查一次即可
 """
 import pandas as pd
 
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     date = pd.to_datetime(end)
 
     for func_name in [
-        "stock_board_industry_name_em",  # 东方财富-行业板块
+        "stock_board_concept_name_em",  # 东方财富-行业板块
     ]:
         path = DATA_ROOT / func_name
         d = Dump__date(ak, path, 'date')
