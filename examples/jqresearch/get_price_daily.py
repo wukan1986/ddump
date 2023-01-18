@@ -28,7 +28,7 @@ def do_get_price(d, start_date, end_date, universe, fields, fq):
     d.set_parameters('get_price',
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist(), fq=fq, panel=False, fields=fields)
-    if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 3):
+    if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 2):
         d.download()
         d.save(save_empty=True)
 
@@ -41,7 +41,7 @@ def do_get_extras(d, start_date, end_date, universe, info):
                      info=info,
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security_list=symbols.index.tolist(), df=True)
-    if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 3):
+    if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 2):
         d.download()
         d.save(save_empty=True)
 

@@ -6,6 +6,6 @@ if __name__ == '__main__':
     for types in ['stock', 'futures']:
         d = Dump(jq, path, ['types'])  # ‘stock’, ‘fund’, ‘index’, ‘futures’, ‘etf’, ‘lof’, ‘fja’, ‘fjb’
         d.set_parameters('get_all_securities', types=types)
-        if not d.exists(timeout=86400 * 15):
+        if not d.exists(timeout=86400 * 7):
             d.download()
             d.save(save_empty=True)
