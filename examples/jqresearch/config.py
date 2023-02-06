@@ -13,5 +13,12 @@ jq = RpcClient('jqresearch.api', conn, async_local=False)
 jq.cache_get = False
 jq.cache_expire = 60
 
+# StateException('Interruptingcow can only be used from the MainThread.',)
+# 由于query相关操作无法异步，所以只能指定async_remote=False
+jqr = RpcClient('jqresearch_query', conn, async_local=False, async_remote=False)
+jqr.cache_get = False
+jqr.cache_expire = 60
+
 DATA_ROOT = pathlib.Path('../..').resolve() / 'data/jqresearch'
 DATA_ROOT = pathlib.Path(r'D:\data\jqresearch')
+DATA_ROOT_AKSHARE = pathlib.Path(r'D:\data\akshare')
