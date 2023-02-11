@@ -172,7 +172,7 @@ class Dump:
         if df is None:
             raise Exception('需要在download中设置数据到self.df后才能保存')
 
-        if df.empty:
+        if hasattr(df, 'empty') and df.empty:
             # 丢弃表头，防止concat时float字段被改成了object
             df = pd.DataFrame()
             if not save_empty:

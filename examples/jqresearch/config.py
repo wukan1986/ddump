@@ -9,7 +9,7 @@ URL = 'ws://127.0.0.1:8000/ws/admin?room=9527'
 URL = 'ws://1.117.86.56:8000/ws/admin?room=9527'
 
 conn = WebSocketConnection(URL, token=TOKEN)
-jq = RpcClient('jqresearch.api', conn, async_local=False)
+jq = RpcClient('jqresearch.api', conn, async_local=False, async_remote=False)
 jq.cache_get = False
 jq.cache_expire = 60
 
