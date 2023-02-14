@@ -74,8 +74,6 @@ def do_get_industry(d, start_date, end_date, symbols):
 
 
 if __name__ == '__main__':
-    end = pd.to_datetime(datetime.today().date())
-
     types = 'stock'
     universe = pd.read_parquet(DATA_ROOT / 'get_all_securities' / f'{types}.parquet')
 
