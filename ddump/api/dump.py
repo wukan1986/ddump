@@ -184,7 +184,11 @@ class Dump:
         self.path.mkdir(parents=True, exist_ok=True)
         # 保存
         logger.info('保存 {} {} {}', len(self.df), self.func_name, self.file_path)
-        df.to_parquet(self.file_path, compression='gzip')
+        try:
+            df.to_parquet(self.file_path, compression='gzip')
+        except Exception as e:
+            print(df)
+            raise e
 
     def load(self):
         """加载数据"""
