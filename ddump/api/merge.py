@@ -44,7 +44,7 @@ def path_groupby_date(input_path, output_path,
     df = pd.DataFrame([f.name.split('.')[0].split(START_SEP_END) for f in files], columns=['start', 'end'])
     df['path'] = files
     df['key'] = pd.to_datetime(df['start'])
-    df.index = df['key']
+    df.index = df['key'].copy()
     df.index.name = 'date'  # 防止无法groupby
 
     from dateutil.relativedelta import relativedelta, MO, SU
@@ -68,8 +68,10 @@ def path_groupby_date(input_path, output_path,
     df['10Y_2'] = df['key'].apply(lambda x: x.date() + relativedelta(year=x.year // 10 * 10 + 9, month=12, day=31))
 
     # 最近的两个月不动，两个月前的都按月合并
-    df.loc[:f'{datetime.now() - timedelta(days=31 * 2):%Y-%m}', 'key'] = df['1M_1']
-    df.loc[:f'{datetime.now() - timedelta(days=365 * 2):%Y}', 'key'] = df['1Y_1']
+    t = f'{datetime.now() - timedelta(days=31 * 2):%Y-%m}'
+    df['key'] = df.loc[:t, '1M_1']
+    t = f'{datetime.now() - timedelta(days=365 * 1):%Y}'
+    df['key'] = df.loc[:t, '1Y_1']
 
     # 按key进行分组
     fss = {}

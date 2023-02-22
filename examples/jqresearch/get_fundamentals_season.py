@@ -30,13 +30,13 @@ if __name__ == '__main__':
         # 前半段，按周查，这样能快一些
         end = pd.to_datetime('2023-01-15')
         end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=6)
-        start = pd.to_datetime('2019-01-02')
+        start = pd.to_datetime('2022-12-01')
 
         for dr in pd.date_range(start=start, end=end, freq='Q'):
             q = f'{dr.year}q{dr.month // 3}'
             d.set_parameters(func_name,
                              end_date=dr,
                              date=q)
-            if not d.exists(file_timeout=3600 * 24, data_timeout=86400 * 2):
+            if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 90):
                 d.download(kw=['date'])
                 d.save(save_empty=True)

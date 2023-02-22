@@ -26,7 +26,7 @@ def do_get_price(d, start_date, end_date, symbols, fields, fq):
     d.set_parameters('get_price',
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist(), fq=fq, panel=False, fields=fields)
-    if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 2):
+    if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         d.download()
         d.save(save_empty=True)
 
@@ -37,7 +37,7 @@ def do_get_extras(d, start_date, end_date, symbols, info):
                      info=info,
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security_list=symbols.index.tolist(), df=True)
-    if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 2):
+    if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         d.download()
         d.save(save_empty=True)
 
@@ -68,7 +68,7 @@ def do_get_industry(d, start_date, end_date, symbols):
                      start_date=f'{start_date:%Y-%m-%d}',
                      date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist())
-    if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 2):
+    if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         d.download(kw=['security', 'date'])
         d.save(save_empty=True, pre_save=save_func_get_industry, pre_save_kwargs={'date': end_date})
 
@@ -91,6 +91,7 @@ if __name__ == '__main__':
     # 下周，由date_range调到本周日
     end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=6)
     start = pd.to_datetime('2023-01-02')  # 星期一
+    start = pd.to_datetime('2015-01-01')  # 星期一
     for dr in pd.date_range(start=start, end=end, freq='W'):
         start_date = dr - pd.Timedelta(days=6)
         end_date = dr

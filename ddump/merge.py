@@ -51,7 +51,7 @@ def merge_files_to_file(path, files,
 
     # 写入临时文件
     path.parent.mkdir(parents=True, exist_ok=True)
-    dfs.to_parquet(file_temp, compression='gzip')
+    dfs.to_parquet(file_temp, compression='zstd')
 
     # 全删
     if delete_src:
@@ -63,7 +63,7 @@ def merge_files_to_file(path, files,
 
 
 def merge_files_dict(files_dict,
-                     ignore_index=True, delete_src=False):
+                     ignore_index=False, delete_src=False):
     """合并特殊字典。
 
     key为路径

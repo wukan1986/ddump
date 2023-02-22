@@ -185,7 +185,7 @@ class Dump:
         # 保存
         logger.info('保存 {} {} {}', len(self.df), self.func_name, self.file_path)
         try:
-            df.to_parquet(self.file_path, compression='gzip')
+            df.to_parquet(self.file_path, compression='zstd')
         except Exception as e:
             print(df)
             raise e

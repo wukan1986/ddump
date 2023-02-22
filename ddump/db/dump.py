@@ -181,7 +181,7 @@ def continue_download(db, tbl_name, path,
 
     logger.info('保存 {}条 {} {}', len(df), tbl_name, temp_path)
     # 写入要时间，所以先放临时文件，然后再改名
-    df.to_parquet(temp_path, compression='gzip')
+    df.to_parquet(temp_path, compression='zstd')
     temp_path.rename(file_path)
     if len(df) < limit * page:
         # 下载完成
@@ -296,9 +296,9 @@ def merge3(path0, path1, path2):
     """
     # 合并历史数据，方便复制
     files = path_groupby_size(path0, path0, per_size=128 * 1024 * 1024, reserve=0)
-    merge_files_dict(files, delete_src=True)
+    merge_files_dict(files, ignore_index=True, delete_src=True)
     files = path_groupby_size(path1, path1, per_size=128 * 1024 * 1024, reserve=0)
-    merge_files_dict(files, delete_src=True)
+    merge_files_dict(files, ignore_index=True, delete_src=True)
     # 每日更新部分，不能老合并，因为修改太多，网络传输量会过大，改成两个月前的都合成一个月，最近两个月的不动
     files = path_groupby_date(path2, path2, reserve=2)
-    merge_files_dict(files, delete_src=True)
+    merge_files_dict(files, ignore_index=True, delete_src=True)
