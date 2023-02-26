@@ -1,12 +1,17 @@
 """
 下载历史数据后，很早以前的数据可以合并。一年合并一次即可
+
+历史数据如果还没有验证，应当选取其它方式验证多次后再合并
+因为只要发现某天数据有问题，只要删了那天的文件，即可重新下载对应部分
 """
 import pathlib
+
+from loguru import logger
 
 from ddump.api.merge import path_groupby_date
 from ddump.merge import merge_files_dict
 
-paths = [
+paths1 = [
     r'D:\data\jqresearch\get_extras_stock_is_st',
     r'D:\data\jqresearch\get_industry_stock',
     r'D:\data\jqresearch\get_price_stock_factor',
@@ -17,16 +22,21 @@ paths = [
     r'D:\data\jqresearch\get_fundamentals_indicator',
     r'D:\data\jqresearch\get_fundamentals_valuation',
 ]
-for path in paths:
-    path = pathlib.Path(path)
-    files = path_groupby_date(path, path)
-    merge_files_dict(files, ignore_index=False, delete_src=True)
 
-if False:
-    # 测试用
-    path1 = r'D:\data\jqresearch\get_fundamentals_balance'
+paths2 = [
+    r'M:\data\jqresearch\get_extras_stock_is_st',
+    r'M:\data\jqresearch\get_industry_stock',
+    r'M:\data\jqresearch\get_price_stock_factor',
+    r'M:\data\jqresearch\get_price_stock_daily',
+    r'M:\data\jqresearch\get_fundamentals_balance',
+    r'M:\data\jqresearch\get_fundamentals_cash_flow',
+    r'M:\data\jqresearch\get_fundamentals_income',
+    r'M:\data\jqresearch\get_fundamentals_indicator',
+    r'M:\data\jqresearch\get_fundamentals_valuation',
+]
+for path1, path2 in zip(paths1, paths2):
+    logger.info('=' * 60, )
     path1 = pathlib.Path(path1)
-    path2 = r'D:\data\jqresearch\get_fundamentals_balance_2'
     path2 = pathlib.Path(path2)
     files = path_groupby_date(path1, path2)
     merge_files_dict(files, ignore_index=False, delete_src=False)

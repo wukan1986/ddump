@@ -110,6 +110,7 @@ def path_groupby_date(input_path, output_path,
     df = pd.DataFrame([f.name.split('.')[0].split(KEY_SEP_ID) for f in files], columns=['key', 'id'])
     df['path'] = files
     df['key'] = pd.to_datetime(df['key'])
+    df['key2'] = df['key']
     df.index = df['key'].copy()
     df.index.name = 'date'  # 防止无法groupby
 
@@ -133,11 +134,15 @@ def path_groupby_date(input_path, output_path,
     df['10Y_1'] = df['key'].apply(lambda x: x.date() + relativedelta(year=x.year // 10 * 10, month=1, day=1))
     df['10Y_2'] = df['key'].apply(lambda x: x.date() + relativedelta(year=x.year // 10 * 10 + 9, month=12, day=31))
 
+    df['1M_1'] = pd.to_datetime(df['1M_1'])
+    df['1Y_1'] = pd.to_datetime(df['1Y_1'])
+
     # 最近的两个月不动，两个月前的都按月合并
     t = f'{datetime.now() - timedelta(days=31 * 2):%Y-%m}'
     df['key'] = df.loc[:t, '1M_1']
     t = f'{datetime.now() - timedelta(days=365 * 1):%Y}'
     df['key'] = df.loc[:t, '1Y_1']
+    df['key'].fillna(df['key2'], inplace=True)
 
     # 按key进行分组
     fss = {}

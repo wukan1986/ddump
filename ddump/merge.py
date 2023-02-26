@@ -1,10 +1,13 @@
+import shutil
+
 import pandas as pd
 from loguru import logger
 
 
 def merge_files_to_file(path, files,
                         ignore_index=True,
-                        delete_src=False):
+                        delete_src=False,
+                        single_overwrite=True):
     """合并件列表到文件
 
     Parameters
@@ -17,17 +20,30 @@ def merge_files_to_file(path, files,
         合并时是否忽略索引。索引没有意义时忽略能加速
     delete_src: bool
         是否删除源文件
-
-    Returns
-    -------
+    single_overwrite: bool
+        单文件是否进行覆盖
 
     """
     if len(files) == 0:
         return
+
     if len(files) == 1:
         if path == files[0]:
             # 同一文件，没有必要合并
             return
+        else:
+            if path.exists() and not single_overwrite:
+                logger.info('单路径，已存在，跳过 {}', path)
+                return
+            else:
+                logger.info('单路径，直接覆盖 {}', path)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(files[0], path)
+                return
+
+    if path.exists():
+        logger.info('合并目标，已存在，跳过 {}', path)
+        return
 
     # 加载
     dfs = []
@@ -69,5 +85,7 @@ def merge_files_dict(files_dict,
     key为路径
     value为列表
     """
-    for k, v in files_dict.items():
-        merge_files_to_file(k, v, ignore_index, delete_src)
+    for i, (k, v) in enumerate(files_dict.items()):
+        # 最后5个单文件总是试着覆盖
+        single_overwrite = i >= len(files_dict) - 5
+        merge_files_to_file(k, v, ignore_index, delete_src, single_overwrite)
