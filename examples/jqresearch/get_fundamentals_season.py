@@ -36,7 +36,7 @@ if __name__ == '__main__':
             q = f'{dr.year}q{dr.month // 3}'
             d.set_parameters(func_name,
                              end_date=dr,
-                             date=q)
+                             statDate=q)
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 90):
-                d.download(kw=['date'])
+                d.download(kw=['statDate'])
                 d.save(save_empty=True)

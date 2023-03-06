@@ -3,6 +3,8 @@
 
 历史数据如果还没有验证，应当选取其它方式验证多次后再合并
 因为只要发现某天数据有问题，只要删了那天的文件，即可重新下载对应部分
+
+TODO: 财务表过了一段时间后可能有问题，需要特别注意
 """
 import pathlib
 
@@ -38,5 +40,5 @@ for path1, path2 in zip(paths1, paths2):
     logger.info('=' * 60, )
     path1 = pathlib.Path(path1)
     path2 = pathlib.Path(path2)
-    files = path_groupby_date(path1, path2)
+    files = path_groupby_date(path1, path2, reserve=2)
     merge_files_dict(files, ignore_index=False, delete_src=False)
