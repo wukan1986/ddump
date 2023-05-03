@@ -23,6 +23,7 @@ paths1 = [
     r'D:\data\jqresearch\get_fundamentals_income',
     r'D:\data\jqresearch\get_fundamentals_indicator',
     r'D:\data\jqresearch\get_fundamentals_valuation',
+    r'D:\data\jqresearch\get_stk_xr_xd',
 ]
 
 paths2 = [
@@ -35,6 +36,7 @@ paths2 = [
     r'M:\data\jqresearch\get_fundamentals_income',
     r'M:\data\jqresearch\get_fundamentals_indicator',
     r'M:\data\jqresearch\get_fundamentals_valuation',
+    r'M:\data\jqresearch\get_stk_xr_xd',
 ]
 for path1, path2 in zip(paths1, paths2):
     logger.info('=' * 60, )
