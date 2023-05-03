@@ -45,8 +45,15 @@ def get_fundamentals_indicator(date=None, statDate=None):
 
 
 def get_stk_xr_xd(report_date=None):
-    """除权除息，原函数一次只能取4000，所以需要添加特别处理"""
+    """除权除息，原函数一次只能取4000，所以需要添加特别处理
+
+    601088在2017年第一季度有特别分红
+    """
     from jqdata import finance as F
+
+    end_date = report_date
+    start_date = pd.to_datetime(report_date) - pd.Timedelta(days=80)
+    start_date = f'{start_date:%Y-%m-01}'
 
     dfs = []
     last_id = -1
@@ -54,7 +61,8 @@ def get_stk_xr_xd(report_date=None):
         q = (
             query(F.STK_XR_XD)
             .filter(
-                F.STK_XR_XD.report_date == report_date,
+                F.STK_XR_XD.report_date >= start_date,
+                F.STK_XR_XD.report_date <= end_date,
                 F.STK_XR_XD.id > last_id)
             .order_by(F.STK_XR_XD.id)
             .limit(3000)
