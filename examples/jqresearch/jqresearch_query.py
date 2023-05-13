@@ -76,4 +76,5 @@ def get_stk_xr_xd(report_date=None):
     if len(dfs) == 0:
         return pd.DataFrame()
     else:
-        return pd.concat(dfs)
+        # reset_index(drop=True)解决版本不同时No module named 'pandas.core.indexes.numeric'
+        return pd.concat(dfs).reset_index(drop=True)
