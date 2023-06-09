@@ -4,14 +4,6 @@
 import pandas as pd
 
 
-def get_fundamentals_valuation(date=None, statDate=None):
-    """市值数据，每日更新"""
-    q = query(
-        valuation
-    )
-    return get_fundamentals(q, date=date, statDate=statDate)
-
-
 def get_fundamentals_balance(date=None, statDate=None):
     """资产负债数据，按季更新"""
     q = query(
@@ -77,4 +69,28 @@ def get_stk_xr_xd(report_date=None):
         return pd.DataFrame()
     else:
         # reset_index(drop=True)解决版本不同时No module named 'pandas.core.indexes.numeric'
+        return pd.concat(dfs).reset_index(drop=True)
+
+
+def get_fundamentals_valuation(date=None, statDate=None):
+    """市值数据，每日更新"""
+    dfs = []
+    last_id = -1
+    while True:
+        q = (
+            query(valuation)
+            .filter(valuation.id > last_id)
+            .order_by(valuation.id)
+            .limit(4000)
+        )
+
+        df = get_fundamentals(q, date=date, statDate=statDate)
+        if df.empty:
+            break
+        last_id = df['id'].iloc[-1]
+        dfs.append(df)
+
+    if len(dfs) == 0:
+        return pd.DataFrame()
+    else:
         return pd.concat(dfs).reset_index(drop=True)
