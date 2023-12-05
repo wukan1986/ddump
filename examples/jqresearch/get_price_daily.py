@@ -32,6 +32,12 @@ def do_get_price(d, start_date, end_date, symbols, fields, fq):
         d.save(save_empty=True)
 
 
+def save_func_get_extras(df: pd.DataFrame):
+    df = df.stack(dropna=True).reset_index()
+    df.columns = ['time', 'code', 'is_st']
+    return df[df['is_st']]
+
+
 def do_get_extras(d, start_date, end_date, symbols, info):
     # 下载日线数据
     d.set_parameters('get_extras',
@@ -40,7 +46,7 @@ def do_get_extras(d, start_date, end_date, symbols, info):
                      security_list=symbols.index.tolist(), df=True)
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         d.download()
-        d.save(save_empty=True)
+        d.save(save_empty=True, pre_save=save_func_get_extras)
 
 
 def dict_get(x, name, val):
@@ -92,7 +98,8 @@ if __name__ == '__main__':
     end = pd.to_datetime('2023-01-15')  # 星期日
     # 下周，由date_range调到本周日
     end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=6)
-    start = pd.to_datetime('2023-01-02')  # 星期一
+    start = pd.to_datetime('2023-10-02')  # 星期一
+    # start = pd.to_datetime('2014-12-29')  # 星期一
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错
     start_list = []

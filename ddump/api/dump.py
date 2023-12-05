@@ -183,7 +183,7 @@ class Dump:
 
         self.path.mkdir(parents=True, exist_ok=True)
         # 保存
-        logger.info('保存 {} {} {}', len(self.df), self.func_name, self.file_path)
+        logger.info('保存 {} {} {}', len(df), self.func_name, self.file_path)
         try:
             df.to_parquet(self.file_path, compression='zstd')
         except Exception as e:

@@ -24,7 +24,6 @@ if __name__ == '__main__':
         "get_fundamentals_cash_flow",
         "get_fundamentals_income",
         "get_fundamentals_indicator",
-        "get_fundamentals_indicator",
     ]:
         path = DATA_ROOT / func_name
         d = Dump__date(jqr, path, 'end_date')
