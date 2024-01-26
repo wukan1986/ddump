@@ -1,7 +1,10 @@
+import itertools
 import shutil
 
 import pandas as pd
 from loguru import logger
+
+from ddump.common import FILE_SUFFIX, START_SEP_END
 
 
 def merge_files_to_file(path, files,
@@ -74,6 +77,8 @@ def merge_files_to_file(path, files,
         for f in files:
             f.unlink(missing_ok=True)
 
+    # TODO 应当将此范围内重复的都删了
+
     # 改名
     file_temp.rename(path)
 
@@ -85,7 +90,48 @@ def merge_files_dict(files_dict,
     key为路径
     value为列表
     """
-    for i, (k, v) in enumerate(files_dict.items()):
-        # 最后5个单文件总是试着覆盖
-        single_overwrite = i >= len(files_dict) - 5
-        merge_files_to_file(k, v, ignore_index, delete_src, single_overwrite)
+    for i, kv in enumerate(files_dict):
+        # 最后N个单文件总是试着覆盖
+        single_overwrite = i >= len(files_dict) - 3
+        merge_files_to_file(kv['to'], kv['from'], ignore_index, delete_src, single_overwrite)
+
+
+def check_include(start1, end1, start2, end2):
+    """不包含，返回0
+    <，返回-1，>返回1
+    """
+    if (start1 >= start2) & (end1 <= end2):
+        return -1
+    elif (start1 <= start2) & (end1 >= end2):
+        return 1
+    return 0
+
+
+def remove_sub_range(input_path, suffix=FILE_SUFFIX):
+    """移除子范围"""
+    files = list(input_path.glob(f'*{suffix}'))
+
+    df = pd.DataFrame([f.name.split('.')[0].split(START_SEP_END) for f in files], columns=['start', 'end'])
+    df['path'] = files
+    df['key1'] = pd.to_datetime(df['start'])
+    df['key2'] = pd.to_datetime(df['end'])
+    df.index = df['key1'].copy()
+    df.index.name = 'date'  # 防止无法groupby
+
+    remove_df = []
+    combinations = list(itertools.combinations(range(len(df)), 2))
+    for i, j in combinations:
+        m, n = df.iloc[i], df.iloc[j]
+        r = check_include(m['start'], m['end'], n['start'], n['end'])
+        if r != 0:
+            logger.info("{},({},{}), {}-{},{}-{}", r, i, j, m['start'], m['end'], n['start'], n['end'])
+        if r > 0:
+            remove_df.append(n)
+        elif r < 0:
+            remove_df.append(m)
+
+    for i in remove_df:
+        f = i['path']
+        f.unlink(missing_ok=True)
+
+    return

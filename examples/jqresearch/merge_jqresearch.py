@@ -11,7 +11,7 @@ import pathlib
 from loguru import logger
 
 from ddump.api.merge import path_groupby_date
-from ddump.merge import merge_files_dict
+from ddump.merge import merge_files_dict, remove_sub_range
 
 paths1 = [
     r'D:\data\jqresearch\get_extras_stock_is_st',
@@ -42,5 +42,6 @@ for path1, path2 in zip(paths1, paths2):
     logger.info('=' * 60, )
     path1 = pathlib.Path(path1)
     path2 = pathlib.Path(path2)
-    files = path_groupby_date(path1, path2, reserve=2)
+    files = path_groupby_date(path1, path2)
     merge_files_dict(files, ignore_index=False, delete_src=False)
+    remove_sub_range(path2)

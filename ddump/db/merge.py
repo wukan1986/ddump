@@ -145,17 +145,12 @@ def path_groupby_date(input_path, output_path,
     df['key'].fillna(df['key2'], inplace=True)
 
     # 按key进行分组
-    fss = {}
+    fss = []
     for k, v in df.groupby(by='key'):
         # 1W_1是组内完全一样，所以直接取最后一行也行
-        fs = v['path'].tolist()
-        fss[output_path / fs[-1].name] = fs
+        from_ = v['path'].tolist()
+        to_ = output_path / from_[-1].name
 
-    # 最近的两个文件不动
-    fs = []
-    for f in files_tail:
-        fs.append(f)
-        fss[output_path / f.name] = fs
-        fs = []
+        fss.append({'to': to_, 'from': from_})
 
     return fss

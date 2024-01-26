@@ -10,8 +10,7 @@ from .common import start_end_2_name
 from ..common import FILE_SUFFIX, START_SEP_END
 
 
-def path_groupby_date(input_path, output_path,
-                      reserve=2, suffix=FILE_SUFFIX):
+def path_groupby_date(input_path, output_path, suffix=FILE_SUFFIX):
     """根据文件名上所示时间进行分组
 
     文件名由 开始时间+结束时间组成
@@ -22,8 +21,6 @@ def path_groupby_date(input_path, output_path,
         输入目录
     output_path: pathlib.Path
         输出目录
-    reserve: int
-        预留文件数。最后几个文件不动，可能会被修改
     suffix
 
     Returns
@@ -34,11 +31,7 @@ def path_groupby_date(input_path, output_path,
     if output_path is None:
         output_path = input_path
 
-    files_tail = []
     files = list(input_path.glob(f'*{suffix}'))
-    if reserve > 0:
-        files_tail = files[-reserve:]
-        files = files[:-reserve]
 
     # 提取文件名中的时间
     df = pd.DataFrame([f.name.split('.')[0].split(START_SEP_END) for f in files], columns=['start', 'end'])
@@ -79,16 +72,12 @@ def path_groupby_date(input_path, output_path,
     df['key'].fillna(df['key2'], inplace=True)
 
     # 按key进行分组
-    fss = {}
+    fss = []
     for k, v in df.groupby(by='key'):
-        name = start_end_2_name(v['start'][0], v['end'][-1])
-        fss[output_path / f"{name}{FILE_SUFFIX}"] = v['path'].tolist()
-
-    # 最近的两个文件不动
-    fs = []
-    for f in files_tail:
-        fs.append(f)
-        fss[output_path / f.name] = fs
-        fs = []
+        s, e = v['start'][0], v['end'][-1]
+        name = start_end_2_name(s, e)
+        to_ = output_path / f"{name}{FILE_SUFFIX}"
+        from_ = v['path'].tolist()
+        fss.append({'to': to_, 'from': from_})
 
     return fss
