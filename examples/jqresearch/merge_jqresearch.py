@@ -13,31 +13,29 @@ from loguru import logger
 from ddump.api.merge import path_groupby_date
 from ddump.merge import merge_files_dict, remove_sub_range
 
-paths1 = [
-    r'D:\data\jqresearch\get_extras_stock_is_st',
-    r'D:\data\jqresearch\get_industry_stock',
-    r'D:\data\jqresearch\get_price_stock_factor',
-    r'D:\data\jqresearch\get_price_stock_daily',
-    r'D:\data\jqresearch\get_fundamentals_balance',
-    r'D:\data\jqresearch\get_fundamentals_cash_flow',
-    r'D:\data\jqresearch\get_fundamentals_income',
-    r'D:\data\jqresearch\get_fundamentals_indicator',
-    r'D:\data\jqresearch\get_fundamentals_valuation',
-    r'D:\data\jqresearch\get_stk_xr_xd',
-]
 
-paths2 = [
-    r'M:\data\jqresearch\get_extras_stock_is_st',
-    r'M:\data\jqresearch\get_industry_stock',
-    r'M:\data\jqresearch\get_price_stock_factor',
-    r'M:\data\jqresearch\get_price_stock_daily',
-    r'M:\data\jqresearch\get_fundamentals_balance',
-    r'M:\data\jqresearch\get_fundamentals_cash_flow',
-    r'M:\data\jqresearch\get_fundamentals_income',
-    r'M:\data\jqresearch\get_fundamentals_indicator',
-    r'M:\data\jqresearch\get_fundamentals_valuation',
-    r'M:\data\jqresearch\get_stk_xr_xd',
-]
+def get_paths(root):
+    return [
+        rf'{root}\get_extras_stock_is_st',
+        rf'{root}\get_industry_stock',
+        rf'{root}\get_price_stock_factor',
+        rf'{root}\get_price_stock_daily',
+        rf'{root}\get_fundamentals_balance',
+        rf'{root}\get_fundamentals_cash_flow',
+        rf'{root}\get_fundamentals_income',
+        rf'{root}\get_fundamentals_indicator',
+        rf'{root}\get_fundamentals_valuation',
+        rf'{root}\get_STK_XR_XD',
+        rf'{root}\get_STK_BALANCE_SHEET',
+        rf'{root}\get_STK_CASHFLOW_STATEMENT',
+        rf'{root}\get_STK_INCOME_STATEMENT',
+    ]
+
+
+root1 = r'D:\data\jqresearch'
+root2 = r'M:\data\jqresearch'
+paths1 = get_paths(root1)
+paths2 = get_paths(root2)
 for path1, path2 in zip(paths1, paths2):
     logger.info('=' * 60, )
     path1 = pathlib.Path(path1)

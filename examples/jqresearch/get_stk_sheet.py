@@ -6,15 +6,22 @@ from ddump.api.dump import Dump__date
 from examples.jqresearch.config import DATA_ROOT, jqr
 
 """
-除权除息数据下载
+原始报表下载
 
-注意，分红时间的报告期不一定是按季出现
+资产负债表
+利润表
+现金流量表
+
+如果数据下载是按报告期，这会导致要下载之前的数据基本上要全部重下一次，不现实
+如果按发布期来算，就没有问题了
 """
 
 if __name__ == '__main__':
 
     for func_name in [
-        "get_STK_XR_XD",
+        "get_STK_BALANCE_SHEET",
+        "get_STK_INCOME_STATEMENT",
+        "get_STK_CASHFLOW_STATEMENT",
     ]:
         path = DATA_ROOT / func_name
         d = Dump__date(jqr, path, 'end_date')
@@ -27,7 +34,7 @@ if __name__ == '__main__':
             q = f'{dr:%Y-%m-%d}'
             d.set_parameters(func_name,
                              end_date=dr,
-                             board_plan_pub_date=q)
+                             pub_date=q)
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 150):
-                d.download(kw=['board_plan_pub_date'])
+                d.download(kw=['pub_date'])
                 d.save(save_empty=True)
