@@ -26,7 +26,7 @@ if __name__ == '__main__':
         path = DATA_ROOT / func_name
         d = Dump__date(jqr, path, 'end_date')
         # 前半段，按周查，这样能快一些
-        end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=6)
+        end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=81)
         start = pd.to_datetime('2014-12-20')
         # start = pd.to_datetime('2022-12-20')
 
@@ -35,6 +35,6 @@ if __name__ == '__main__':
             d.set_parameters(func_name,
                              end_date=dr,
                              pub_date=q)
-            if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 150):
+            if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 90):
                 d.download(kw=['pub_date'])
                 d.save(save_empty=True)
