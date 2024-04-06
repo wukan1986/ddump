@@ -76,7 +76,7 @@ def do_get_industry(d, start_date, end_date, symbols):
                      end_date=f'{end_date:%Y-%m-%d}',
                      date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist())
-    if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
+    if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 4):
         d.download(kw=['security', 'date'])
         d.save(save_empty=True, pre_save=save_func_get_industry, pre_save_kwargs={'date': end_date})
 
