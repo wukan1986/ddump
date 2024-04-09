@@ -28,7 +28,7 @@ def do_get_price(d, start_date, end_date, symbols, fields, fq):
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist(), fq=fq, panel=False, fields=fields)
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
-        d.download()
+        d.download(kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields'])
         d.save(save_empty=True)
 
 
@@ -45,7 +45,7 @@ def do_get_extras(d, start_date, end_date, symbols, info):
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security_list=symbols.index.tolist(), df=True)
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
-        d.download()
+        d.download(kw=['info', 'start_date', 'end_date', 'security_list', 'df'])
         d.save(save_empty=True, pre_save=save_func_get_extras)
 
 

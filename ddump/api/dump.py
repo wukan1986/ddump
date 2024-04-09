@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author     :wukan
-# @License    :(C) Copyright 2022, redhorse
+# @License    :(C) Copyright 2022
 # @Date       :2022-02-14
 
 """
@@ -124,7 +124,7 @@ class Dump:
             else:
                 return False
 
-    def download(self, kw=None):
+    def download(self, kw):
         """下载动作。每个API的函数与参数不同，需定制重载
 
         Returns
@@ -142,12 +142,13 @@ class Dump:
         """
         logger.info('下载 {} {} {}', self.func_name, self.args, self.kwargs)
         api = getattr(self.api, self.func_name)
-        if kw is None:
-            self.df = api(*self.args, **self.kwargs)
-        else:
-            # 只有约定的键才做为参数
-            _kwargs = {k: v for k, v in self.kwargs.items() if k in kw}
-            self.df = api(*self.args, **_kwargs)
+        # if kw is None:
+        #     self.df = api(*self.args, **self.kwargs)
+
+        # 只有约定的键才做为参数
+        _kwargs = {k: v for k, v in self.kwargs.items() if k in kw}
+        self.df = api(*self.args, **_kwargs)
+
         # 部分API返回为None
         if self.df is None:
             self.df = pd.DataFrame()
