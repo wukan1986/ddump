@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ddump"
+authors = [
+    { name = "wukan", email = "wu-kan@163.com" },
+]
+description = "A data dump tool"
+readme = "README.md"
+requires-python = ">=3.6"
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python"
+]
+dependencies = [
+    'loguru',
+    'pandas',
+    'pyarrow',
+    'PyMySQL',
+    'SQLAlchemy>=1.4',
+    'tenacity',
+]
+dynamic = ["version"]
+
+
+[tool.setuptools]
+packages = [
+    "ddump",
+    "ddump.api",
+    "ddump.db",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "ddump._version.__version__" }
