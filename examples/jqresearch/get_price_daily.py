@@ -29,7 +29,7 @@ def do_get_price(d, start_date, end_date, symbols, fields, fq):
                      security=symbols.index.tolist(), fq=fq, panel=False, fields=fields)
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         d.download(kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields'])
-        d.save(save_empty=True)
+        d.save()
 
 
 def save_func_get_extras(df: pd.DataFrame):
@@ -46,7 +46,7 @@ def do_get_extras(d, start_date, end_date, symbols, info):
                      security_list=symbols.index.tolist(), df=True)
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         d.download(kw=['info', 'start_date', 'end_date', 'security_list', 'df'])
-        d.save(save_empty=True, pre_save=save_func_get_extras)
+        d.save(pre_save=save_func_get_extras)
 
 
 def dict_get(x, name, val):
@@ -78,7 +78,7 @@ def do_get_industry(d, start_date, end_date, symbols):
                      security=symbols.index.tolist())
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 4):
         d.download(kw=['security', 'date'])
-        d.save(save_empty=True, pre_save=save_func_get_industry, pre_save_kwargs={'date': end_date})
+        d.save(pre_save=save_func_get_industry, pre_save_kwargs={'date': end_date})
 
 
 if __name__ == '__main__':

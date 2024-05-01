@@ -7,4 +7,4 @@ if __name__ == '__main__':
     d.set_parameters('tool_trade_date_hist_sina', filename='calendar')
     if not d.exists(timeout=86400 * 1):
         d.download(kw=[])
-        d.save(save_empty=True)
+        d.save()

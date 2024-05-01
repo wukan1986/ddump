@@ -39,4 +39,4 @@ if __name__ == '__main__':
                              statDate=q)
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 150):
                 d.download(kw=['statDate'])
-                d.save(save_empty=True)
+                d.save()

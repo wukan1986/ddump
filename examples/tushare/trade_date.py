@@ -26,7 +26,7 @@ if __name__ == '__main__':
         for i, trade_date in enumerate(trading_day):
             d.set_parameters(func_name, trade_date=trade_date)
             if not d.exists(file_timeout=3600 * 4, data_timeout=86400 * 2):
-                d.download()
-                d.save(save_empty=True)
+                d.download(kw=['trade_date'])
+                d.save()
                 if i % n == n - 1:
                     time.sleep(m)

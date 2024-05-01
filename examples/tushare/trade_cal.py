@@ -7,5 +7,5 @@ if __name__ == '__main__':
     for exchange in ('SSE', 'SZSE'):
         d.set_parameters('trade_cal', exchange=exchange)
         if not d.exists(timeout=86400 * 15):
-            d.download()
-            d.save(save_empty=True)
+            d.download(kw=['exchange'])
+            d.save()

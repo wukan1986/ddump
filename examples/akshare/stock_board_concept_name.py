@@ -19,4 +19,4 @@ if __name__ == '__main__':
         d.set_parameters(func_name, date=date)
         if not d.exists(file_timeout=3600 * 0.5, data_timeout=86400 * 2):
             d.download(kw=[])
-            d.save(save_empty=True)
+            d.save()

@@ -8,4 +8,4 @@ if __name__ == '__main__':
         d.set_parameters('get_all_securities', types=types)
         if not d.exists(timeout=3600 * 1):
             d.download(kw=['types'])
-            d.save(save_empty=True)
+            d.save()

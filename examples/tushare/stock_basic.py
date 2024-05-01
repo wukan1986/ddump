@@ -12,5 +12,5 @@ if __name__ == '__main__':
         for list_status in ('L', 'D', 'P'):
             d.set_parameters('stock_basic', exchange=exchange, list_status=list_status)
             if not d.exists(timeout=3600 * 12):
-                d.download()
-                d.save(save_empty=True)
+                d.download(kw=['exchange', 'list_status'])
+                d.save()

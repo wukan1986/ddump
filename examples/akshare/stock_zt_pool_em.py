@@ -46,8 +46,8 @@ def main():
         for i, date in enumerate(trading_day):
             d.set_parameters(func_name, date=f'{date:%Y%m%d}')
             if not d.exists(file_timeout=3600 * 12, data_timeout=86400 * 1):
-                d.download()
-                d.save(save_empty=True, pre_save=save_funcs.get(func_name, None))
+                d.download(kw=['date'])
+                d.save(pre_save=save_funcs.get(func_name, None))
                 # 这个地方按情况调整
                 if i % 10 == 1:
                     time.sleep(10)

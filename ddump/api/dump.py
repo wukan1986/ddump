@@ -26,6 +26,10 @@ from ..api.common import (
 from ..common import START_SEP_END
 
 
+def func_pre_save(df, **kwargs):
+    return df
+
+
 class Dump:
     # 单文件路径
     file_path = None
@@ -34,7 +38,7 @@ class Dump:
     # 文件夹中的所有文件，用于判断文件是否已经存在
     files_df = None
     # 下载的单期数据
-    df = None
+    dfs = []
     # 底层调用的函数名
     func_name = None
     # 位置参数
@@ -62,12 +66,12 @@ class Dump:
 
     def reset(self):
         """重置"""
-        self.file_path = None
-        self.files_df = None
-        self.df = None
-        self.func_name = None
-        self.args = ()
-        self.kwargs = {}
+        self.dfs = []
+        # self.file_path = None
+        # self.files_df = None
+        # self.func_name = None
+        # self.args = ()
+        # self.kwargs = {}
 
     def set_parameters(self, func_name, *args, **kwargs):
         """设置查询参数
@@ -142,53 +146,39 @@ class Dump:
         """
         logger.info('下载 {} {} {}', self.func_name, self.args, self.kwargs)
         api = getattr(self.api, self.func_name)
-        # if kw is None:
-        #     self.df = api(*self.args, **self.kwargs)
 
         # 只有约定的键才做为参数
         _kwargs = {k: v for k, v in self.kwargs.items() if k in kw}
-        self.df = api(*self.args, **_kwargs)
+        df = api(*self.args, **_kwargs)
+        if df is not None:
+            self.dfs.append(df)
 
-        # 部分API返回为None
-        if self.df is None:
-            self.df = pd.DataFrame()
         # logger.info('数据量 {} {} {} {}', len(self.df), self.func_name, self.args, self.kwargs)
-        return self.df
+        return self.dfs
 
-    def save(self, save_empty, pre_save=None, pre_save_kwargs={}):
+    def save(self, pre_save=func_pre_save, pre_save_kwargs={}):
         """保存数据
 
         Parameters
         ----------
-        save_empty: bool
-            空DataFrame是否保存。全量下载前期不保存，后期得保存，防重复下载
-            读取文件夹时，只要前面的文件不为emtpy就能正常打开
         pre_save: func
             保存前的处理函数，特殊处理用
         pre_save_kwargs: dict
             保存存前处理函数的参数
 
         """
-        df = self.df
-        if df is None:
-            raise Exception('需要在download中设置数据到self.df后才能保存')
-
-        if hasattr(df, 'empty') and df.empty:
-            # 丢弃表头，防止concat时float字段被改成了object
-            df = pd.DataFrame()
-            if not save_empty:
-                return
-        else:
-            if pre_save is not None:
-                df = pre_save(df, **pre_save_kwargs)
+        dfs = [pre_save(df, **pre_save_kwargs) for df in self.dfs]
+        df = pd.concat(dfs)
 
         self.path.mkdir(parents=True, exist_ok=True)
         # 保存
         logger.info('保存 {} {} {}', len(df), self.func_name, self.file_path)
         try:
             df.to_parquet(self.file_path, compression='zstd')
+            self.dfs = []
         except Exception as e:
             print(df)
+            self.dfs = []
             raise e
 
     def load(self):

@@ -25,7 +25,7 @@ if __name__ == '__main__':
         d.set_parameters(func_name, date=date)
         if not d.exists(file_timeout=3600 * 0.5, data_timeout=86400 * 1):
             d.download(kw=[])
-            d.save(save_empty=True)
+            d.save()
 
     # for func_name in [
     #     "stock_hot_follow_xq",  # 股票热度-雪球
@@ -35,4 +35,4 @@ if __name__ == '__main__':
     #     d.set_parameters(func_name, date=date, symbol='最热门')
     #     if not d.exists(file_timeout=3600 * 0.5, data_timeout=86400 * 2):
     #         d.download(kw=['symbol'])
-    #         d.save(save_empty=True)
+    #         d.save()

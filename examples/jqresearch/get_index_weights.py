@@ -37,4 +37,4 @@ if __name__ == '__main__':
             d.set_parameters(func_name, index_id=index_id, date=f'{date:%Y-%m-%d}')
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 3):
                 d.download(kw=['index_id', 'date'])
-                d.save(save_empty=True)
+                d.save()

@@ -23,5 +23,5 @@ if __name__ == '__main__':
             end_date = f'{dr:%Y}1231'
             d.set_parameters(func_name, start_date=start_date, end_date=end_date)
             if not d.exists(file_timeout=86400 * 1, data_timeout=86400 * 10):
-                d.download()
-                d.save(save_empty=True)
+                d.download(kw=['start_date', 'end_date'])
+                d.save()

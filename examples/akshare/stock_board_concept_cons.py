@@ -37,9 +37,9 @@ def main():
             d.set_parameters(func_name, date=date, symbol=row['板块名称'])
             if not d.exists(timeout=86400 * 0.5):
                 d.download(kw=['symbol'])
-                d.save(save_empty=True,
-                       pre_save=save_func_stock_board_industry_cons_em,
-                       pre_save_kwargs={'date': date, 'board': row['板块名称'], 'board_code': row['板块代码']})
+                d.save(
+                    pre_save=save_func_stock_board_industry_cons_em,
+                    pre_save_kwargs={'date': date, 'board': row['板块名称'], 'board_code': row['板块代码']})
                 # 这个地方按情况调整
                 if i % 10 == 1:
                     time.sleep(10)

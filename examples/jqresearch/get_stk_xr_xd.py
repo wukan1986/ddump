@@ -30,4 +30,4 @@ if __name__ == '__main__':
                              board_plan_pub_date=q)
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 90):
                 d.download(kw=['board_plan_pub_date'])
-                d.save(save_empty=True)
+                d.save()
