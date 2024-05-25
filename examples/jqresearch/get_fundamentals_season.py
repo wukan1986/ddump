@@ -32,7 +32,7 @@ if __name__ == '__main__':
         end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=6)
         start = pd.to_datetime('2022-12-01')
 
-        for dr in pd.date_range(start=start, end=end, freq='Q'):
+        for dr in pd.date_range(start=start, end=end, freq='QE'):
             q = f'{dr.year}q{dr.month // 3}'
             d.set_parameters(func_name,
                              end_date=dr,

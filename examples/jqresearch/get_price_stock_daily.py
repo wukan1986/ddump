@@ -60,8 +60,8 @@ def dict_get(x, name, val):
 def save_func_get_industry(df, date):
     dd = pd.DataFrame.from_dict(df, orient='index')
     # zjw栏目下会出现空值
-    df1 = dd.applymap(lambda x: dict_get(x, 'industry_code', None))
-    df2 = dd.applymap(lambda x: dict_get(x, 'industry_name', None))
+    df1 = dd.map(lambda x: dict_get(x, 'industry_code', None))
+    df2 = dd.map(lambda x: dict_get(x, 'industry_name', None))
     df1['is_code'] = True
     df2['is_code'] = False
     df = pd.concat([df1, df2], axis=0)

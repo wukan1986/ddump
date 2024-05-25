@@ -69,12 +69,12 @@ def path_groupby_date(input_path, output_path, suffix=FILE_SUFFIX):
     df['key'] = df.loc[:t, '1M_1']
     t = f'{datetime.now() - timedelta(days=365 * 1):%Y}'
     df['key'] = df.loc[:t, '1Y_1']
-    df['key'].fillna(df['key2'], inplace=True)
+    df['key'] = df['key'].fillna(df['key2'])
 
     # 按key进行分组
     fss = []
     for k, v in df.groupby(by='key'):
-        s, e = v['start'][0], v['end'][-1]
+        s, e = v['start'].iloc[0], v['end'].iloc[-1]
         name = start_end_2_name(s, e)
         to_ = output_path / f"{name}{FILE_SUFFIX}"
         from_ = v['path'].tolist()

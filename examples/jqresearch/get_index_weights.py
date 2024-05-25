@@ -18,7 +18,7 @@ if __name__ == '__main__':
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
     trading_day = trading_day['2023-01-01':end]
-    trading_day = trading_day.resample('M').last()
+    trading_day = trading_day.resample('ME').last()
 
     func_name = f'get_index_weights'
     for index_id in [

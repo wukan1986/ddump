@@ -30,7 +30,7 @@ if __name__ == '__main__':
         start = pd.to_datetime('2014-12-20')
         start = pd.to_datetime('2023-12-20')
 
-        for dr in pd.date_range(start=start, end=end, freq='Q'):
+        for dr in pd.date_range(start=start, end=end, freq='QE'):
             q = f'{dr:%Y-%m-%d}'
             d.set_parameters(func_name,
                              end_date=dr,
