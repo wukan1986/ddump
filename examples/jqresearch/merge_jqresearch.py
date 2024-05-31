@@ -30,6 +30,9 @@ def get_paths(root):
         (rf'{root}\get_STK_CASHFLOW_STATEMENT', True),
         (rf'{root}\get_STK_INCOME_STATEMENT', True),
 
+        (rf'{root}\get_index_weights\000016.XSHG', False),
+        (rf'{root}\get_index_weights\000300.XSHG', False),
+        (rf'{root}\get_index_weights\000852.XSHG', False),
         (rf'{root}\get_index_weights\000905.XSHG', False),
     ]
 
