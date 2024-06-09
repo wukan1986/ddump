@@ -34,6 +34,8 @@ def get_paths(root):
         (rf'{root}\get_index_weights\000300.XSHG', False),
         (rf'{root}\get_index_weights\000852.XSHG', False),
         (rf'{root}\get_index_weights\000905.XSHG', False),
+
+        (rf'{root}\get_price_futures_daily', False),
     ]
 
 

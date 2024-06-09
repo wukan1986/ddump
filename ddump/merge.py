@@ -63,6 +63,7 @@ def merge_files_to_file(path, files,
 
     # 合并,希望内存够
     logger.info('合并 {} 至 {} 等 {}个文件。是否删除?{}', h.name, t.name, len(files), delete_src)
+    dfs = [d for d in dfs if not d.empty]
     dfs = pd.concat(dfs, ignore_index=ignore_index)
 
     file_temp = path.with_suffix('.tmp')
