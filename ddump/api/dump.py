@@ -30,6 +30,10 @@ def func_pre_save(df, **kwargs):
     return df
 
 
+def func_post_download(df, **kwargs):
+    return df
+
+
 class Dump:
     # 单文件路径
     file_path = None
@@ -128,7 +132,7 @@ class Dump:
             else:
                 return False
 
-    def download(self, kw):
+    def download(self, kw, post_download=func_post_download, post_download_kwargs={}):
         """下载动作。每个API的函数与参数不同，需定制重载
 
         Returns
@@ -151,6 +155,7 @@ class Dump:
         _kwargs = {k: v for k, v in self.kwargs.items() if k in kw}
         df = api(*self.args, **_kwargs)
         if df is not None:
+            df = post_download(df, **post_download_kwargs)
             self.dfs.append(df)
 
         # logger.info('数据量 {} {} {} {}', len(self.df), self.func_name, self.args, self.kwargs)

@@ -3,6 +3,8 @@
 # 只能以同步方式调用
 import pandas as pd
 
+from jqresearch.api import *  # noqa
+
 
 def get_fundamentals_balance(date=None, statDate=None):
     """资产负债数据，按季更新"""
@@ -130,27 +132,38 @@ def get_STK_XR_XD(board_plan_pub_date=None):
 
     601088在2017年第一季度有特别分红
     """
-    from jqdata import finance as F
+    from jqdata import finance as F  # noqa
 
     return _get_finance_xr_xd(F, F.STK_XR_XD, board_plan_pub_date)
 
 
 def get_STK_INCOME_STATEMENT(pub_date=None):
     """合并利润表"""
-    from jqdata import finance as F
+    from jqdata import finance as F  # noqa
 
     return _get_finance_table(F, F.STK_INCOME_STATEMENT, pub_date)
 
 
 def get_STK_CASHFLOW_STATEMENT(pub_date=None):
     """合并现金流量表"""
-    from jqdata import finance as F
+    from jqdata import finance as F  # noqa
 
     return _get_finance_table(F, F.STK_CASHFLOW_STATEMENT, pub_date)
 
 
 def get_STK_BALANCE_SHEET(pub_date=None):
     """合并资产负债表"""
-    from jqdata import finance as F
+    from jqdata import finance as F  # noqa
 
     return _get_finance_table(F, F.STK_BALANCE_SHEET, pub_date)
+
+
+# ===========================================
+def get_dominant_futures_all(symbols, date, end_date):
+    """批量获取主力合约代码"""
+    from jqdata.apis import get_dominant_futures  # noqa
+
+    df = {}
+    for symbol in symbols:
+        df[symbol] = get_dominant_futures(symbol, date, end_date)
+    return pd.DataFrame(df)
