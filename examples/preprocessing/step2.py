@@ -1,3 +1,7 @@
+"""
+添加涨停，明天涨停
+每日成分股权重等信息
+"""
 from pathlib import Path
 
 import polars as pl
