@@ -1,5 +1,5 @@
 """
-下载历史数据后，很早以前的数据可以合并。一年合并一次即可
+历史数据按天下载过来后，用户可以直接使用，但小文件多加载效率低，可以提前合并
 
 历史数据如果还没有验证，应当选取其它方式验证多次后再合并
 因为只要发现某天数据有问题，只要删了那天的文件，即可重新下载对应部分
@@ -23,6 +23,8 @@ def get_paths(root):
         (rf'{root}\get_industry_stock', False),
         (rf'{root}\get_price_stock_factor', False),
         (rf'{root}\get_price_stock_daily', False),
+
+        # ignore_index=True 表示合并时丢弃索引，因为索引不含有效信息
         (rf'{root}\get_fundamentals_balance', True),
         (rf'{root}\get_fundamentals_cash_flow', True),
         (rf'{root}\get_fundamentals_income', True),
@@ -43,14 +45,19 @@ def get_paths(root):
     ]
 
 
-root1 = r'D:\data\jqresearch'
-root2 = r'M:\data\jqresearch'
-paths1 = get_paths(root1)
-paths2 = get_paths(root2)
-for (path1, _), (path2, _) in zip(paths1, paths2):
-    logger.info('=' * 60, )
-    path1 = pathlib.Path(path1)
-    path2 = pathlib.Path(path2)
-    files = path_groupby_date(path1, path2)
-    merge_files_dict(files, ignore_index=_, delete_src=False)
-    remove_sub_range(path2)
+# 源数据
+PATH_INPUT1 = r'D:\data\jqresearch'
+# 合并后数据，可以存入内存盘等
+PATH_OUTPUT = r'M:\data\jqresearch'
+
+if __name__ == '__main__':
+
+    paths1 = get_paths(PATH_INPUT1)
+    paths2 = get_paths(PATH_OUTPUT)
+    for (path1, _), (path2, _) in zip(paths1, paths2):
+        logger.info('=' * 60, )
+        path1 = pathlib.Path(path1)
+        path2 = pathlib.Path(path2)
+        files = path_groupby_date(path1, path2)
+        merge_files_dict(files, ignore_index=_, delete_src=False)
+        remove_sub_range(path2)
