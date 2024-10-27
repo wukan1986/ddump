@@ -30,7 +30,7 @@ if __name__ == '__main__':
         # 前半段，按周查，这样能快一些
         end = pd.to_datetime('2023-01-15')
         end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=6)
-        start = pd.to_datetime('2022-12-01')
+        start = pd.to_datetime('2024-06-01')
 
         for dr in pd.date_range(start=start, end=end, freq='QE'):
             q = f'{dr.year}q{dr.month // 3}'

@@ -98,7 +98,7 @@ if __name__ == '__main__':
     end = pd.to_datetime('2023-01-15')  # 星期日
     # 下周，由date_range调到本周日
     end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=6)
-    start = pd.to_datetime('2023-10-02')  # 星期一
+    start = pd.to_datetime('2024-06-01')  # 星期一
     # start = pd.to_datetime('2014-12-29')  # 星期一
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错

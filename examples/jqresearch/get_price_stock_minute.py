@@ -25,7 +25,7 @@ def do_get_price(d, start_date, end_date, symbols, fields, fq):
                      start_date=f'{start_date:%Y-%m-%d} 08:00:00', end_date=f'{end_date:%Y-%m-%d} 16:00:00',
                      security=symbols_list, fq=fq, panel=False, fields=fields, frequency='1m')
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
-        sym_iter = more_itertools.batched(symbols_list, 500)
+        sym_iter = more_itertools.batched(symbols_list, 400)
         for syms in sym_iter:
             d.set_parameters('get_price',
                              start_date=f'{start_date:%Y-%m-%d} 08:00:00', end_date=f'{end_date:%Y-%m-%d} 16:00:00',
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
     # end = f"2024-01-01"
-    trading_day = trading_day['2024-01-01':end]
+    trading_day = trading_day['2024-06-01':end]
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错
     start_list = []
