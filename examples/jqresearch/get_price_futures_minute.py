@@ -41,7 +41,7 @@ if __name__ == '__main__':
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
     # end = f"2024-01-01"
-    trading_day = trading_day['2024-06-01':end]
+    trading_day = trading_day['2024-10-01':end]
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错
     start_list = []

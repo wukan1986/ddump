@@ -66,10 +66,10 @@ def path_groupby_date(input_path, output_path, suffix=FILE_SUFFIX):
 
     # 最近的两个月不动，两个月前的都按月合并
     t = f'{datetime.now() - timedelta(days=31 * 2):%Y-%m}'
-    df['key'] = df.loc[:t, '1M_1']
+    df.loc[:t, 'key'] = df.loc[:t, '1M_1']
     t = f'{datetime.now() - timedelta(days=365 * 1):%Y}'
-    df['key'] = df.loc[:t, '1Y_1']
-    df['key'] = df['key'].fillna(df['key2'])
+    df.loc[:t, 'key'] = df.loc[:t, '1Y_1']
+    # df['key'] = df['key'].fillna(df['key2'])
 
     # 按key进行分组
     fss = []

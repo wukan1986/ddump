@@ -4,7 +4,7 @@ import pandas as pd
 from dateutil.relativedelta import relativedelta
 
 from ddump.api.dump import Dump__start__end
-from examples.jqresearch.config import DATA_ROOT, jq
+from examples.jqresearch.config import DATA_ROOT, jq, DATA_ROOT_AKSHARE
 
 """
 行情数据
@@ -94,31 +94,25 @@ if __name__ == '__main__':
     d3 = Dump__start__end(jq, path3, 'start_date', 'end_date')
     d4 = Dump__start__end(jq, path4, 'start_date', 'end_date')
 
-    # 前半段，按周查，这样能快一些
-    end = pd.to_datetime('2023-01-15')  # 星期日
-    # 下周，由date_range调到本周日
-    end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=6)
-    start = pd.to_datetime('2024-06-01')  # 星期一
-    # start = pd.to_datetime('2014-12-29')  # 星期一
+    end = f"{pd.to_datetime('today') - pd.Timedelta(hours=15, minutes=30):%Y-%m-%d}"
+    # 加载交易日历
+    trading_day = pd.read_parquet(DATA_ROOT_AKSHARE / 'tool_trade_date_hist_sina' / f'calendar.parquet')
+    trading_day = trading_day['trade_date']
+    trading_day.index = pd.to_datetime(trading_day)
+    # 过滤交易日
+    # end = f"2024-11-01"
+    trading_day = trading_day['2024-10-01':end]
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错
     start_list = []
     end_list = []
-    for dr in pd.date_range(start=start, end=end, freq='W'):
-        start_date = dr - pd.Timedelta(days=6)
-        end_date = dr
-        if start_date.month == end_date.month:
-            start_list.append(start_date)
-            end_list.append(end_date)
-        else:
-            start_list.append(start_date)
-            end_list.append(start_date + relativedelta(day=31))
-            start_list.append(end_date + relativedelta(day=1))
-            end_list.append(end_date)
+    for i, date in enumerate(trading_day):
+        start_list.append(date)
+        end_list.append(date)
 
     # 下载数据
     for start_date, end_date in zip(start_list, end_list):
-        symbols = universe.query(f'start_date<=@end_date.date() and end_date>=@start_date.date()')
+        symbols = universe.query(f'start_date<=@end_date and end_date>=@start_date')
 
         do_get_price(d1, start_date, end_date, symbols, fields1, fq1)
         do_get_price(d2, start_date, end_date, symbols, fields2, fq2)

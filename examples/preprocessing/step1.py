@@ -42,7 +42,8 @@ def step1() -> pl.DataFrame:
         pl.read_parquet(PATH_INPUT4, use_pyarrow=True).rename({'date': 'time', '__index_level_0__': 'code'})
         .filter(pl.col('is_code')).drop('is_code')
         .with_columns(
-            pl.col('sw_l1', 'sw_l2', 'sw_l3').cast(pl.UInt32)
+            pl.col('sw_l1', 'sw_l2', 'sw_l3').cast(pl.UInt32),
+            pl.col('time').cast(pl.Datetime('us'))
         )
     )
     # 估值
