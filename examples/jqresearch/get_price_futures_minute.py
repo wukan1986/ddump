@@ -54,7 +54,8 @@ if __name__ == '__main__':
     for start_date, end_date in zip(start_list, end_list):
         symbols = universe.query(f'start_date<=@end_date and end_date>=@start_date')
         if start_date.weekday() == 0:
-            start_date = start_date - pd.Timedelta(days=2)
+            # 周一
+            start_date = start_date - pd.Timedelta(days=3)
         else:
             start_date = start_date - pd.Timedelta(days=1)
         # print(start_date, end_date)

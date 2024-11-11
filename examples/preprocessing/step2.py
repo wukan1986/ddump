@@ -38,8 +38,8 @@ def _code_block_2():
 
     # 这里用未复权的价格更合适
     DOJI4 = four_price_doji(open, high, low, close)
-    # 明日停牌
-    NEXT_DOJI4 = ts_delay(DOJI4, -1)
+    # 明日涨跌停
+    NEXT_DOJI4 = DOJI4[-1]
 
 
 def step1() -> pl.DataFrame:
