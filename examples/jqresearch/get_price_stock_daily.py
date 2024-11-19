@@ -1,7 +1,4 @@
-from datetime import datetime
-
 import pandas as pd
-from dateutil.relativedelta import relativedelta
 
 from ddump.api.dump import Dump__start__end
 from examples.jqresearch.config import DATA_ROOT, jq, DATA_ROOT_AKSHARE
@@ -76,7 +73,7 @@ def do_get_industry(d, start_date, end_date, symbols):
                      end_date=f'{end_date:%Y-%m-%d}',
                      date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist())
-    if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 4):
+    if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         d.download(kw=['security', 'date'])
         d.save(pre_save=save_func_get_industry, pre_save_kwargs={'date': end_date})
 
@@ -101,7 +98,7 @@ if __name__ == '__main__':
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
     # end = f"2024-11-01"
-    trading_day = trading_day['2024-10-01':end]
+    trading_day = trading_day['2024-11-01':end]
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错
     start_list = []

@@ -39,6 +39,7 @@ def files_to_dataframe(path, suffix=FILE_SUFFIX):
     pd.DataFrame
 
     """
+    path = pathlib.Path(path)
     files = list(path.glob(f'*{suffix}'))
     df = pd.DataFrame([f.name.split('.')[0].split(START_SEP_END) for f in files], columns=['start', 'end'])
     # 结束时间

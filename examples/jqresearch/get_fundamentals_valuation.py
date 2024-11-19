@@ -15,7 +15,7 @@ if __name__ == '__main__':
     trading_day = trading_day['trade_date']
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
-    trading_day = trading_day['2024-06-01':end]
+    trading_day = trading_day['2024-10-01':end]
 
     func_name = f'get_fundamentals_valuation'
 
@@ -23,6 +23,6 @@ if __name__ == '__main__':
     d = Dump__date(jqr, path, 'date')
     for i, date in enumerate(trading_day):
         d.set_parameters(func_name, date=f'{date:%Y-%m-%d}')
-        if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 1):
+        if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
             d.download(kw=['date'])
             d.save()
