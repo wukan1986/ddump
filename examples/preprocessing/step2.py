@@ -56,6 +56,13 @@ def step1() -> pl.DataFrame:
         # 后复权
         (pl.col(['open', 'high', 'low', 'close', 'vwap']) * pl.col('factor')).name.map(lambda x: x.upper()),
     ])
+    df = df.with_columns([
+        pl.col('asset').str.starts_with('60').alias('上海主板'),
+        pl.col('asset').str.starts_with('00').alias('深圳主板'),
+        pl.col('asset').str.starts_with('68').alias('科创板'),
+        pl.col('asset').str.starts_with('30').alias('创业板'),
+        (pl.col('asset').str.starts_with('8') | pl.col('asset').str.starts_with('4') | pl.col('asset').str.starts_with('9')).alias('北交所'),
+    ])
     return df
 
 
