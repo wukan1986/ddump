@@ -11,8 +11,8 @@ from examples.jqresearch.config import DATA_ROOT, jqr
 注意，分红时间的报告期不一定是按季出现
 """
 
-if __name__ == '__main__':
 
+def main():
     for func_name in [
         "get_STK_XR_XD",
     ]:
@@ -31,3 +31,7 @@ if __name__ == '__main__':
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 90):
                 d.download(kw=['board_plan_pub_date'])
                 d.save()
+
+
+if __name__ == '__main__':
+    main()

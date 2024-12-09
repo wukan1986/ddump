@@ -47,7 +47,7 @@ def do_get_dominant_futures(d, date, end_date, symbols):
         d.save()
 
 
-if __name__ == '__main__':
+def main():
     types = 'futures'
     universe = pd.read_parquet(DATA_ROOT / 'get_all_securities' / f'{types}.parquet')
     universe['index'] = universe.index
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
     # end = f"2024-11-01"
-    trading_day = trading_day['2024-11-01':end]
+    trading_day = trading_day['2024-12-01':end]
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错
     start_list = []
@@ -82,3 +82,7 @@ if __name__ == '__main__':
         do_get_price(d1, start_date, end_date, symbols, fields1, fq1)
         symbols_list = sorted(symbols['product'].unique())
         do_get_dominant_futures(d2, start_date, end_date, symbols_list)
+
+
+if __name__ == '__main__':
+    main()

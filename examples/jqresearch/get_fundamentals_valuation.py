@@ -8,14 +8,15 @@ from examples.jqresearch.config import DATA_ROOT, jqr, DATA_ROOT_AKSHARE
 每天更新   
 """
 
-if __name__ == '__main__':
+
+def main():
     end = f"{pd.to_datetime('today') - pd.Timedelta(hours=15, minutes=30):%Y-%m-%d}"
     # 加载交易日历
     trading_day = pd.read_parquet(DATA_ROOT_AKSHARE / 'tool_trade_date_hist_sina' / f'calendar.parquet')
     trading_day = trading_day['trade_date']
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
-    trading_day = trading_day['2024-10-01':end]
+    trading_day = trading_day['2024-12-01':end]
 
     func_name = f'get_fundamentals_valuation'
 
@@ -26,3 +27,7 @@ if __name__ == '__main__':
         if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
             d.download(kw=['date'])
             d.save()
+
+
+if __name__ == '__main__':
+    main()

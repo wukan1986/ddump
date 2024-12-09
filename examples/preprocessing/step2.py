@@ -6,23 +6,16 @@ from pathlib import Path
 
 import polars as pl
 import polars.selectors as cs
-from expr_codegen.tool import codegen_exec
+from expr_codegen import codegen_exec
 from loguru import logger
 from polars_ta.wq import *
-
-# 输入路径
-PATH_INPUT1 = r'M:\preprocessing\data1.parquet'
-# 输出路径
-PATH_OUTPUT = r'M:\preprocessing'
-PATH_OUTPUT = Path(PATH_OUTPUT)
-PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
 
 
 def _code_block_1():
     # 不能跳过停牌的相关信息。如成份股相关处理
 
     # 注意：收益没有减1，停牌时值为1。也没有平移
-    ROCR = CLOSE / ts_delay(CLOSE, 1)
+    ROCR = CLOSE / CLOSE[1]
 
     # 不少成份股数据源每月底更新，而不是每天更新，所以需要用以下方法推算
     # 注意1：在成份股调整月，如果缺少调整日的权重信息当月后一段的数据不准确
@@ -43,6 +36,8 @@ def _code_block_2():
 
 
 def step1() -> pl.DataFrame:
+    # 输入路径
+    PATH_INPUT1 = r'M:\preprocessing\data1.parquet'
     # 调整字段名
     df = pl.read_parquet(PATH_INPUT1)
     df = df.rename({'time': 'date', 'code': 'asset', 'money': 'amount'})
@@ -80,14 +75,21 @@ def step2(df: pl.DataFrame) -> pl.DataFrame:
     return df
 
 
-# %%
-if __name__ == '__main__':
-    # %%
+def main():
+    # 输出路径
+    PATH_OUTPUT = r'M:\preprocessing'
+    PATH_OUTPUT = Path(PATH_OUTPUT)
+    PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
+
     logger.info('start')
     df = step1()
     df = step2(df)
-
+    print(df.tail())
     df.write_parquet(PATH_OUTPUT / 'data2.parquet')
 
     logger.info('done')
-    print(df.tail())
+
+
+# %%
+if __name__ == '__main__':
+    main()

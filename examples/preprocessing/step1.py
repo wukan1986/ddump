@@ -8,31 +8,26 @@ import polars as pl
 import polars.selectors as cs
 from loguru import logger
 
-# 输出路径
-PATH_OUTPUT = r'M:\preprocessing'
-PATH_OUTPUT = pathlib.Path(PATH_OUTPUT)
-PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
-
-# 输入路径
-ROOT = r"M:\data\jqresearch"
-# 日线行情
-PATH_INPUT1 = rf'{ROOT}\get_price_stock_daily'
-# 复权因子
-PATH_INPUT2 = rf'{ROOT}\get_price_stock_factor'
-# 是否ST
-PATH_INPUT3 = rf'{ROOT}\get_extras_stock_is_st'
-# 行业分类，申万一级
-PATH_INPUT4 = rf'{ROOT}\get_industry_stock'
-# 估值
-PATH_INPUT5 = rf'{ROOT}\get_fundamentals_valuation'
-# 主要的几个指数权重，如沪深300，中证500等，月底更新
-PATH_INPUT6 = rf'{ROOT}\get_index_weights\000016.XSHG'
-PATH_INPUT7 = rf'{ROOT}\get_index_weights\000300.XSHG'
-PATH_INPUT8 = rf'{ROOT}\get_index_weights\000905.XSHG'
-PATH_INPUT9 = rf'{ROOT}\get_index_weights\000852.XSHG'
-
 
 def step1() -> pl.DataFrame:
+    # 输入路径
+    ROOT = r"M:\data\jqresearch"
+    # 日线行情
+    PATH_INPUT1 = rf'{ROOT}\get_price_stock_daily'
+    # 复权因子
+    PATH_INPUT2 = rf'{ROOT}\get_price_stock_factor'
+    # 是否ST
+    PATH_INPUT3 = rf'{ROOT}\get_extras_stock_is_st'
+    # 行业分类，申万一级
+    PATH_INPUT4 = rf'{ROOT}\get_industry_stock'
+    # 估值
+    PATH_INPUT5 = rf'{ROOT}\get_fundamentals_valuation'
+    # 主要的几个指数权重，如沪深300，中证500等，月底更新
+    PATH_INPUT6 = rf'{ROOT}\get_index_weights\000016.XSHG'
+    PATH_INPUT7 = rf'{ROOT}\get_index_weights\000300.XSHG'
+    PATH_INPUT8 = rf'{ROOT}\get_index_weights\000905.XSHG'
+    PATH_INPUT9 = rf'{ROOT}\get_index_weights\000852.XSHG'
+
     # 多文件加载
     df1 = pl.read_parquet(PATH_INPUT1, use_pyarrow=True).with_columns(pl.col('paused').cast(pl.Boolean))
     df2 = pl.read_parquet(PATH_INPUT2, use_pyarrow=True)
@@ -112,11 +107,21 @@ def step2(df: pl.DataFrame) -> pl.DataFrame:
     return df
 
 
-if __name__ == '__main__':
+def main():
+    # 输出路径
+    PATH_OUTPUT = r'M:\preprocessing'
+    PATH_OUTPUT = pathlib.Path(PATH_OUTPUT)
+    PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
+
     logger.info('start process')
     df = step1()
     df = step2(df)
+
     logger.info('start write')
     df.write_parquet(PATH_OUTPUT / 'data1.parquet')
     logger.info('done')
     print(df.tail())
+
+
+if __name__ == '__main__':
+    main()

@@ -78,7 +78,7 @@ def do_get_industry(d, start_date, end_date, symbols):
         d.save(pre_save=save_func_get_industry, pre_save_kwargs={'date': end_date})
 
 
-if __name__ == '__main__':
+def main():
     types = 'stock'
     universe = pd.read_parquet(DATA_ROOT / 'get_all_securities' / f'{types}.parquet')
 
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
     # end = f"2024-11-01"
-    trading_day = trading_day['2024-11-01':end]
+    trading_day = trading_day['2024-12-01':end]
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错
     start_list = []
@@ -115,3 +115,7 @@ if __name__ == '__main__':
         do_get_price(d2, start_date, end_date, symbols, fields2, fq2)
         do_get_extras(d3, start_date, end_date, symbols, 'is_st')
         do_get_industry(d4, start_date, end_date, symbols)
+
+
+if __name__ == '__main__':
+    main()

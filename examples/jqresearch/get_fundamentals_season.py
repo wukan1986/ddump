@@ -17,8 +17,8 @@ https://www.joinquant.com/community/post/detailMobile?postId=2750  数据常见�
 如需跨期，需从原始表中开始推算
 """
 
-if __name__ == '__main__':
 
+def main():
     for func_name in [
         "get_fundamentals_balance",
         "get_fundamentals_cash_flow",
@@ -40,3 +40,7 @@ if __name__ == '__main__':
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 150):
                 d.download(kw=['statDate'])
                 d.save()
+
+
+if __name__ == '__main__':
+    main()

@@ -45,12 +45,11 @@ def get_paths(root):
     ]
 
 
-# 源数据
-PATH_INPUT1 = r'D:\data\jqresearch'
-# 合并后数据，可以存入内存盘等
-PATH_OUTPUT = r'M:\data\jqresearch'
-
-if __name__ == '__main__':
+def main():
+    # 源数据
+    PATH_INPUT1 = r'D:\data\jqresearch'
+    # 合并后数据，可以存入内存盘等
+    PATH_OUTPUT = r'M:\data\jqresearch'
 
     paths1 = get_paths(PATH_INPUT1)
     paths2 = get_paths(PATH_OUTPUT)
@@ -61,3 +60,7 @@ if __name__ == '__main__':
         files = path_groupby_date(path1, path2)
         merge_files_dict(files, ignore_index=_, delete_src=False)
         remove_sub_range(path2)
+
+
+if __name__ == '__main__':
+    main()

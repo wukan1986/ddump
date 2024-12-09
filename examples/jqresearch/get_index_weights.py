@@ -9,7 +9,8 @@ from examples.jqresearch.config import DATA_ROOT, jq, DATA_ROOT_AKSHARE
 每月底更新   
 """
 
-if __name__ == '__main__':
+
+def main():
     # 上月底
     end = f"{pd.to_datetime('today') + relativedelta(months=-1, day=31):%Y-%m-%d}"
     # 加载交易日历
@@ -17,7 +18,7 @@ if __name__ == '__main__':
     trading_day = trading_day['trade_date']
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
-    trading_day = trading_day['2024-06-01':end]
+    trading_day = trading_day['2024-10-01':end]
     trading_day = trading_day.resample('ME').last()
 
     func_name = f'get_index_weights'
@@ -38,3 +39,7 @@ if __name__ == '__main__':
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 3):
                 d.download(kw=['index_id', 'date'])
                 d.save()
+
+
+if __name__ == '__main__':
+    main()

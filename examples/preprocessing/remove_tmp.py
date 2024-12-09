@@ -55,9 +55,13 @@ def remove(path):
         f.unlink(missing_ok=True)
 
 
-# 源数据
-PATH_INPUT1 = r'D:\data\jqresearch'
-if __name__ == '__main__':
+def main():
+    # 源数据
+    PATH_INPUT1 = r'D:\data\jqresearch'
     paths = get_paths(PATH_INPUT1)
     for path, _ in paths:
         remove(path)
+
+
+if __name__ == '__main__':
+    main()

@@ -8,3 +8,4 @@ if __name__ == '__main__':
     if not d.exists(timeout=86400 * 1):
         d.download(kw=[])
         d.save()
+    print(d.load())

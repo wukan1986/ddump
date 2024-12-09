@@ -16,8 +16,8 @@ from examples.jqresearch.config import DATA_ROOT, jqr
 如果按发布期来算，就没有问题了
 """
 
-if __name__ == '__main__':
 
+def main():
     for func_name in [
         "get_STK_BALANCE_SHEET",
         "get_STK_INCOME_STATEMENT",
@@ -38,3 +38,7 @@ if __name__ == '__main__':
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 90):
                 d.download(kw=['pub_date'])
                 d.save()
+
+
+if __name__ == '__main__':
+    main()

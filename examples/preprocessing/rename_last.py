@@ -52,9 +52,13 @@ def rename(path):
     file.rename(file.with_suffix(FILE_SUFFIX + TEMP_SUFFIX))
 
 
-# 源数据
-PATH_INPUT1 = r'D:\data\jqresearch'
-if __name__ == '__main__':
+def main():
+    # 源数据
+    PATH_INPUT1 = r'D:\data\jqresearch'
     paths = get_paths(PATH_INPUT1)
     for path, _ in paths:
         rename(path)
+
+
+if __name__ == '__main__':
+    main()

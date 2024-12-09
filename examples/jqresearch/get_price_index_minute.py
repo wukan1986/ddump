@@ -49,7 +49,8 @@ symbols = [
     "399852.XSHE",  # 中证1000
 ]
 
-if __name__ == '__main__':
+
+def main():
     types = 'index'
 
     path = DATA_ROOT / f'get_price_{types}_minute'
@@ -62,7 +63,7 @@ if __name__ == '__main__':
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
     # end = f"2024-04-30"
-    trading_day = trading_day['2024-10-01':end]
+    trading_day = trading_day['2024-12-01':end]
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错
     start_list = []
@@ -74,3 +75,7 @@ if __name__ == '__main__':
     # 下载数据
     for start_date, end_date in zip(start_list, end_list):
         do_get_price(d, start_date, end_date, symbols, fields1, fq1)
+
+
+if __name__ == '__main__':
+    main()
