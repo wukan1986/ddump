@@ -57,7 +57,10 @@ def main():
     PATH_INPUT1 = r'D:\data\jqresearch'
     paths = get_paths(PATH_INPUT1)
     for path, _ in paths:
-        rename(path)
+        try:
+            rename(path)
+        except FileExistsError as e:
+            logger.error(e)
 
 
 if __name__ == '__main__':
