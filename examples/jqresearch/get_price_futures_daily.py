@@ -23,6 +23,7 @@ def do_get_price(d, start_date, end_date, symbols, fields, fq):
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist(), fq=fq, panel=False, fields=fields)
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
+        # print(start_date, end_date)
         d.download(kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields'])
         d.save()
 
@@ -41,6 +42,7 @@ def do_get_dominant_futures(d, date, end_date, symbols):
                      symbols=symbols,
                      date=f'{date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}')
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
+        # print(date, end_date)
         d.download(kw=['symbols', 'date', 'end_date'],
                    post_download=post_download_get_dominant_futures,
                    post_download_kwargs={'end_date': f'{end_date:%Y-%m-%d}'})
@@ -58,14 +60,14 @@ def main():
     path2 = DATA_ROOT / f'get_dominant_futures'
     d2 = Dump__start__end(jqr, path2, 'date', 'end_date')
 
-    end = f"{pd.to_datetime('today') - pd.Timedelta(hours=15, minutes=30):%Y-%m-%d}"
     # 加载交易日历
     trading_day = pd.read_parquet(DATA_ROOT_AKSHARE / 'tool_trade_date_hist_sina' / f'calendar.parquet')
     trading_day = trading_day['trade_date']
     trading_day.index = pd.to_datetime(trading_day)
     # 过滤交易日
-    # end = f"2024-11-01"
-    trading_day = trading_day['2024-12-01':end]
+    end = f"{pd.to_datetime('today') - pd.Timedelta(hours=15, minutes=30):%Y-%m-%d}"
+    start = f"{pd.to_datetime('today') - pd.Timedelta(days=32):%Y-%m-%d}"
+    trading_day = trading_day[start:end]
 
     # 只要跨月了就划分成两部分，实现指定月份也能加载不出错
     start_list = []

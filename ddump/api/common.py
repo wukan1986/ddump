@@ -1,5 +1,6 @@
 import pathlib
 import time
+from functools import lru_cache
 
 import pandas as pd
 
@@ -23,6 +24,7 @@ def start_end_2_name(start, end):
     return f'{start}{START_SEP_END}{end}'
 
 
+@lru_cache(maxsize=4)
 def files_to_dataframe(path, suffix=FILE_SUFFIX):
     """目录中文件转DataFrame
 
