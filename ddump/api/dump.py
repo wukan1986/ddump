@@ -16,7 +16,7 @@ import pathlib
 
 import pandas as pd
 from loguru import logger
-from tenacity import retry, wait_fixed, stop_after_attempt
+from tenacity import retry, wait_fixed
 
 from .common import FILE_SUFFIX
 from ..api.common import (
@@ -133,7 +133,7 @@ class Dump:
             else:
                 return False
 
-    @retry(wait=wait_fixed(15), stop=stop_after_attempt(3))
+    @retry(wait=wait_fixed(15))  # , stop=stop_after_attempt(3)，好像是全局3次
     def download(self, kw, post_download=func_post_download, post_download_kwargs={}):
         """下载动作。每个API的函数与参数不同，需定制重载
 
