@@ -24,7 +24,7 @@ from ..api.common import (
     start_end_2_name,
     filter_range_in_dataframe,
     timeout_mtime)
-from ..common import START_SEP_END
+from ..common import START_SEP_END, get_key, read_obj, write_obj, remove_obj
 
 
 def func_pre_save(df, **kwargs):
@@ -43,7 +43,7 @@ class Dump:
     # 文件夹中的所有文件，用于判断文件是否已经存在
     files_df = None
     # 下载的单期数据
-    dfs = []
+    dfs = {}
     # 底层调用的函数名
     func_name = None
     # 位置参数
@@ -71,7 +71,7 @@ class Dump:
 
     def reset(self):
         """重置"""
-        self.dfs = []
+        self.dfs = {}
         # self.file_path = None
         # self.files_df = None
         # self.func_name = None
@@ -151,14 +151,23 @@ class Dump:
 
         """
         logger.info('下载 {} {} {}', self.func_name, self.args, self.kwargs)
-        api = getattr(self.api, self.func_name)
 
         # 只有约定的键才做为参数
         _kwargs = {k: v for k, v in self.kwargs.items() if k in kw}
-        df = api(*self.args, **_kwargs)
+        # 生成hash，用于数据缓存
+        key = get_key(self.func_name, self.args, _kwargs, '.tmp')
+        df = read_obj(key)
+        if df is None:
+            api = getattr(self.api, self.func_name)
+            df = api(*self.args, **_kwargs)
+            if isinstance(df, dict):
+                assert df['status'] == 200, f'{df}'
+            write_obj(df, key)
+        else:
+            logger.info('命中缓存 {} {}', self.func_name, key)
         if df is not None:
             df = post_download(df, **post_download_kwargs)
-            self.dfs.append(df)
+            self.dfs[key] = df
 
         # logger.info('数据量 {} {} {} {}', len(self.df), self.func_name, self.args, self.kwargs)
         return self.dfs
@@ -174,7 +183,7 @@ class Dump:
             保存存前处理函数的参数
 
         """
-        dfs = [pre_save(df, **pre_save_kwargs) for df in self.dfs]
+        dfs = [pre_save(df, **pre_save_kwargs) for key, df in self.dfs.items()]
         df = pd.concat(dfs)
 
         self.path.mkdir(parents=True, exist_ok=True)
@@ -182,10 +191,12 @@ class Dump:
         logger.info('保存 {} {} {}', len(df), self.func_name, self.file_path)
         try:
             df.to_parquet(self.file_path, compression='zstd')
-            self.dfs = []
+            for k, v in self.dfs.items():
+                remove_obj(k)
+            self.dfs = {}
         except Exception as e:
             print(df)
-            self.dfs = []
+            self.dfs = {}
             raise e
 
     def load(self):
