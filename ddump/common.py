@@ -6,12 +6,18 @@
 import hashlib
 import pathlib
 import pickle
+import tempfile
+
+from loguru import logger
 
 FILE_SUFFIX = '.parquet'  # 文件后缀名
 TEMP_SUFFIX = '.tmp'  # 临时文件后缀名
 KEY_SEP_ID = '__'  # 文件名分隔符。注意:KEY中不要出现__否则无法区分。KEY中出现双下划线的概率比单下载线的概率低很多
 START_SEP_END = '__'  # 文件名分隔符。用于区分开始时间与结束时间。
 OLD_DATA_DAY = 86400 * 10  # N天前的老数据认为不再更新，不需要重复下载。最长放9天
+TEMP_DIR = pathlib.Path(tempfile.gettempdir()) / 'ddump'
+TEMP_DIR.mkdir(parents=True, exist_ok=True)
+logger.info(TEMP_DIR)
 
 
 def get_key(func_name, args, kwargs, ext):
@@ -23,7 +29,7 @@ def get_key(func_name, args, kwargs, ext):
     key_str = func_name.encode() + b':' + args_str + b':' + kwargs_str
 
     # 计算 MD5
-    return hashlib.md5(key_str).hexdigest() + ext
+    return TEMP_DIR / (hashlib.md5(key_str).hexdigest() + ext)
 
 
 def write_obj(obj, path):

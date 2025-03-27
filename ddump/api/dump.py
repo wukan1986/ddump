@@ -24,7 +24,7 @@ from ..api.common import (
     start_end_2_name,
     filter_range_in_dataframe,
     timeout_mtime)
-from ..common import START_SEP_END, get_key, read_obj, write_obj, remove_obj
+from ..common import START_SEP_END, get_key, read_obj, write_obj, remove_obj, TEMP_SUFFIX
 
 
 def func_pre_save(df, **kwargs):
@@ -155,14 +155,17 @@ class Dump:
         # 只有约定的键才做为参数
         _kwargs = {k: v for k, v in self.kwargs.items() if k in kw}
         # 生成hash，用于数据缓存
-        key = get_key(self.func_name, self.args, _kwargs, '.tmp')
+        key = get_key(self.func_name, self.args, _kwargs, TEMP_SUFFIX)
         df = read_obj(key)
         if df is None:
             api = getattr(self.api, self.func_name)
             df = api(*self.args, **_kwargs)
             if isinstance(df, dict):
-                assert df['status'] == 200, f'{df}'
+                if df.get('status', 200) != 200:
+                    logger.error(f'{df}')
+                    raise
             write_obj(df, key)
+            # logger.info('写入缓存 {} {}', self.func_name, key)
         else:
             logger.info('命中缓存 {} {}', self.func_name, key)
         if df is not None:
