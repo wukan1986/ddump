@@ -16,12 +16,14 @@ classifiers = [
     "Programming Language :: Python"
 ]
 dependencies = [
-    'loguru',
-    'pandas',
-    'pyarrow',
-    'PyMySQL',
-    'SQLAlchemy>=1.4',
-    'tenacity',
+    "ksrpc",
+    "loguru",
+    "pandas",
+    "pyarrow",
+    "pymysql",
+    "sqlalchemy>=1.4",
+    "tenacity",
+    "more_itertools",
 ]
 dynamic = ["version"]
 

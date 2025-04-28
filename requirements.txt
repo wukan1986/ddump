@@ -4,3 +4,7 @@ pyarrow
 PyMySQL
 SQLAlchemy>=1.4
 tenacity
+ksrpc
+more_itertools
+polars
+expr_codegen

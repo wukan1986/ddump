@@ -64,7 +64,7 @@ def step1() -> pl.DataFrame:
 def step2(df: pl.DataFrame) -> pl.DataFrame:
     df = df.fill_nan(None)
 
-    df = codegen_exec(df, _code_block_1, over_null="partition_by").filter(~pl.col('paused'))
+    df = codegen_exec(df, _code_block_1, over_null=None).filter(~pl.col('paused'))
     df = codegen_exec(df, _code_block_2, over_null="partition_by")
 
     df = df.drop(['sz50', 'hs300', 'zz500', 'zz1000'])
