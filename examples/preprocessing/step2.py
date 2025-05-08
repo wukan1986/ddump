@@ -71,7 +71,7 @@ def step2(df: pl.DataFrame) -> pl.DataFrame:
     # 计算出来的结果需要进行部分修复，防止之后计算时出错
     df = df.with_columns(pl.col('NEXT_DOJI4').fill_null(False))
     # 将计算结果中的inf都换成null
-    df = df.with_columns(fill_nan(purify(cs.numeric())))
+    df = df.with_columns(purify(cs.numeric()))
     return df
 
 
