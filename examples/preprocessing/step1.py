@@ -109,7 +109,7 @@ def step2(df: pl.DataFrame) -> pl.DataFrame:
 
 def main():
     # 输出路径
-    PATH_OUTPUT = r'M:\preprocessing'
+    PATH_OUTPUT = r'F:\preprocessing'
     PATH_OUTPUT = pathlib.Path(PATH_OUTPUT)
     PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
 
