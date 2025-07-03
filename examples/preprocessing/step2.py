@@ -35,9 +35,7 @@ def _code_block_2():
     NEXT_DOJI4 = DOJI4[-1]
 
 
-def step1() -> pl.DataFrame:
-    # 输入路径
-    PATH_INPUT1 = r'M:\preprocessing\data1.parquet'
+def step1(PATH_INPUT1) -> pl.DataFrame:
     # 调整字段名
     df = pl.read_parquet(PATH_INPUT1)
     df = df.rename({'time': 'date', 'code': 'asset', 'money': 'amount'})
@@ -82,7 +80,9 @@ def main():
     PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
 
     logger.info('start')
-    df = step1()
+    # 输入路径
+    PATH_INPUT1 = r'F:\preprocessing\data1.parquet'
+    df = step1(PATH_INPUT1)
     df = step2(df)
     print(df.tail())
     df.write_parquet(PATH_OUTPUT / 'data2.parquet')

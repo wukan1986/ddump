@@ -9,9 +9,7 @@ import polars.selectors as cs
 from loguru import logger
 
 
-def step1() -> pl.DataFrame:
-    # 输入路径
-    ROOT = r"M:\data\jqresearch"
+def step1(ROOT) -> pl.DataFrame:
     # 日线行情
     PATH_INPUT1 = rf'{ROOT}\get_price_stock_daily'
     # 复权因子
@@ -114,7 +112,8 @@ def main():
     PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
 
     logger.info('start process')
-    df = step1()
+    ROOT = r"M:\data\jqresearch"
+    df = step1(ROOT)
     df = step2(df)
 
     logger.info('start write')
