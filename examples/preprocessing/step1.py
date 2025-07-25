@@ -28,7 +28,7 @@ def step1(ROOT) -> pl.DataFrame:
 
     # 多文件加载
     df1 = pl.read_parquet(PATH_INPUT1, use_pyarrow=True).with_columns(pl.col('paused').cast(pl.Boolean))
-    df2 = pl.read_parquet(PATH_INPUT2, use_pyarrow=True)
+    # df2 = pl.read_parquet(PATH_INPUT2, use_pyarrow=True)
     df3 = pl.read_parquet(PATH_INPUT3, use_pyarrow=True, columns=['time', 'code', 'is_st'])
     # 行业分类
     df4 = (
@@ -66,7 +66,7 @@ def step1(ROOT) -> pl.DataFrame:
 
     # 排序，合并时能提速
     df1 = df1.sort(by=['code', 'time'])
-    df2 = df2.sort(by=['code', 'time'])
+    # df2 = df2.sort(by=['code', 'time'])
     df3 = df3.sort(by=['code', 'time'])
     df4 = df4.sort(by=['code', 'time'])
     df5 = df5.sort(by=['code', 'time'])
@@ -78,7 +78,7 @@ def step1(ROOT) -> pl.DataFrame:
     # 多表合并
     dd = (
         df1
-        .join(df2, on=['code', 'time'], how='left', coalesce=True)
+        # .join(df2, on=['code', 'time'], how='left', coalesce=True)
         .join(df3, on=['code', 'time'], how='left', coalesce=True)
         .join(df4, on=['code', 'time'], how='left', coalesce=True)
         .join(df5, on=['code', 'time'], how='left', coalesce=True)

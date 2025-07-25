@@ -34,6 +34,38 @@ def _code_block_2():
     # 明日涨跌停
     NEXT_DOJI4 = DOJI4[-1]
 
+def calc_factor1(df: pl.DataFrame,
+                 by1: str = 'stock_code', by2: str = 'time',
+                 close: str = 'close', pre_close: str = 'pre_close') -> pl.DataFrame:
+    """计算复权因子，乘除法。使用交易所发布的昨收盘价计算
+
+    Parameters
+    ----------
+    df : pl.DataFrame
+        数据
+    by1 : str
+        分组字段
+    by2 : str
+        排序字段
+    close : str
+        收盘价字段
+    pre_close : str
+        昨收盘价字段
+
+    Notes
+    -----
+    不关心是否真发生了除权除息过程，只要知道前收盘价和收盘价不等就表示发生了除权除息
+
+    """
+    df = (
+        df
+        .sort(by1, by2)
+        .with_columns(
+            factor1=(pl.col(close).shift(1, fill_value=pl.first(pre_close)) / pl.col(pre_close)).round(8).over(
+                by1, order_by=by2))
+        .with_columns(factor2=(pl.col('factor1').cum_prod()).over(by1, order_by=by2))
+    )
+    return df
 
 def step1(PATH_INPUT1) -> pl.DataFrame:
     # 调整字段名
@@ -45,9 +77,11 @@ def step1(PATH_INPUT1) -> pl.DataFrame:
         (pl.col('amount') / pl.col('volume')).alias('vwap'),
     ])
 
+    df = calc_factor1(df, by1='asset', by2='date', close='close', pre_close='pre_close')
+
     df = df.with_columns([
         # 后复权
-        (pl.col(['open', 'high', 'low', 'close', 'vwap']) * pl.col('factor')).name.map(lambda x: x.upper()),
+        (pl.col(['open', 'high', 'low', 'close', 'vwap']) * pl.col('factor2')).name.map(lambda x: x.upper()),
     ])
     df = df.with_columns([
         pl.col('asset').str.starts_with('60').alias('上海主板'),
