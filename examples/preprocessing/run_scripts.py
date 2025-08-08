@@ -3,6 +3,7 @@ from examples import preprocessing as prp  # noqa
 
 prp.rename_last.main()
 
+jqr.get_index_weights.main()
 jqr.get_all_securities.main()
 jqr.get_fundamentals_valuation.main()
 jqr.get_price_futures_daily.main()
