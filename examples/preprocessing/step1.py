@@ -12,8 +12,8 @@ from loguru import logger
 def step1(ROOT) -> pl.DataFrame:
     # 日线行情
     PATH_INPUT1 = rf'{ROOT}\get_price_stock_daily'
-    # 复权因子
-    PATH_INPUT2 = rf'{ROOT}\get_price_stock_factor'
+    # IPO日期
+    PATH_INPUT2 = rf'D:\data\jqresearch\get_all_securities\stock.parquet'
     # 是否ST
     PATH_INPUT3 = rf'{ROOT}\get_extras_stock_is_st'
     # 行业分类，申万一级
@@ -27,8 +27,16 @@ def step1(ROOT) -> pl.DataFrame:
     PATH_INPUT9 = rf'{ROOT}\get_index_weights\000852.XSHG'
 
     # 多文件加载
-    df1 = pl.read_parquet(PATH_INPUT1, use_pyarrow=True).with_columns(pl.col('paused').cast(pl.Boolean))
-    # df2 = pl.read_parquet(PATH_INPUT2, use_pyarrow=True)
+    df1 = pl.read_parquet(PATH_INPUT1, use_pyarrow=True).with_columns(pl.col('paused').cast(pl.Boolean)).drop(
+        ['__index_level_0__'])
+    df2 = (
+        pl.read_parquet(PATH_INPUT2, use_pyarrow=True)
+        .rename({'__index_level_0__': 'code', 'start_date': 'ipo_date'})
+        .select('code', 'ipo_date')
+        .with_columns(
+            pl.col('ipo_date').cast(pl.Datetime('us'))
+        )
+    )
     df3 = pl.read_parquet(PATH_INPUT3, use_pyarrow=True, columns=['time', 'code', 'is_st'])
     # 行业分类
     df4 = (
@@ -78,7 +86,7 @@ def step1(ROOT) -> pl.DataFrame:
     # 多表合并
     dd = (
         df1
-        # .join(df2, on=['code', 'time'], how='left', coalesce=True)
+        .join(df2, on=['code'], how='left', coalesce=True)
         .join(df3, on=['code', 'time'], how='left', coalesce=True)
         .join(df4, on=['code', 'time'], how='left', coalesce=True)
         .join(df5, on=['code', 'time'], how='left', coalesce=True)
@@ -86,7 +94,10 @@ def step1(ROOT) -> pl.DataFrame:
         .join(df7, on=['code', 'time'], how='left', coalesce=True)
         .join(df8, on=['code', 'time'], how='left', coalesce=True)
         .join(df9, on=['code', 'time'], how='left', coalesce=True)
-    ).with_columns(pl.col('is_st').fill_null(False))
+    ).with_columns(
+        pl.col('is_st').fill_null(False),
+        total_days=(pl.col('time') - pl.col('ipo_date')).dt.total_days() + 1
+    )
     return dd
 
 
