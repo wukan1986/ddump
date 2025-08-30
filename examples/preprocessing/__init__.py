@@ -3,3 +3,4 @@ from . import remove_tmp
 from . import rename_last
 from . import step1
 from . import step2
+from . import step3

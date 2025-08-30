@@ -49,7 +49,7 @@ def main():
     # 源数据
     PATH_INPUT1 = r'D:\data\jqresearch'
     # 合并后数据，可以存入内存盘等
-    PATH_OUTPUT = r'M:\data\jqresearch'
+    PATH_OUTPUT = r'F:\data\jqresearch'
 
     paths1 = get_paths(PATH_INPUT1)
     paths2 = get_paths(PATH_OUTPUT)

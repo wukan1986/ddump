@@ -8,7 +8,7 @@ import polars as pl
 import polars.selectors as cs
 from expr_codegen import codegen_exec
 from loguru import logger
-from polars_ta.wq import *
+from polars_ta.wq import purify
 
 
 def _code_block_1():
@@ -33,6 +33,7 @@ def _code_block_2():
     DOJI4 = four_price_doji(open, high, low, close)
     # 明日涨跌停
     NEXT_DOJI4 = DOJI4[-1]
+
 
 def calc_factor1(df: pl.DataFrame,
                  by1: str = 'stock_code', by2: str = 'time',
@@ -67,37 +68,39 @@ def calc_factor1(df: pl.DataFrame,
     )
     return df
 
+
 def step1(PATH_INPUT1) -> pl.DataFrame:
     # 调整字段名
     df = pl.read_parquet(PATH_INPUT1)
-    df = df.rename({'time': 'date', 'code': 'asset', 'money': 'amount'})
+    # df = df.rename({'time': 'date', 'code': 'asset', 'money': 'amount'})
+    df = df.rename({'money': 'amount'})
 
-    df = df.with_columns([
+    df = df.with_columns(
         # 成交均价，未复权
-        (pl.col('amount') / pl.col('volume')).alias('vwap'),
-    ])
+        vwap=pl.col('amount') / pl.col('volume')
+    )
 
-    df = calc_factor1(df, by1='asset', by2='date', close='close', pre_close='pre_close')
+    df = calc_factor1(df, by1='code', by2='time', close='close', pre_close='pre_close')
 
-    df = df.with_columns([
+    df = df.with_columns(
         # 后复权
         (pl.col(['open', 'high', 'low', 'close', 'vwap']) * pl.col('factor2')).name.map(lambda x: x.upper()),
-    ])
-    df = df.with_columns([
-        pl.col('asset').str.starts_with('60').alias('上海主板'),
-        pl.col('asset').str.starts_with('00').alias('深圳主板'),
-        pl.col('asset').str.starts_with('68').alias('科创板'),
-        pl.col('asset').str.starts_with('30').alias('创业板'),
-        (pl.col('asset').str.starts_with('8') | pl.col('asset').str.starts_with('4') | pl.col('asset').str.starts_with('9')).alias('北交所'),
-    ])
+    )
+    df = df.with_columns(
+        上海主板=pl.col('code').str.starts_with('60'),
+        深圳主板=pl.col('code').str.starts_with('00'),
+        科创板=pl.col('code').str.starts_with('68'),
+        创业板=pl.col('code').str.starts_with('30'),
+        北交所=pl.col('code').str.starts_with('8') | pl.col('code').str.starts_with('4') | pl.col('code').str.starts_with('9'),
+    )
     return df
 
 
 def step2(df: pl.DataFrame) -> pl.DataFrame:
     df = df.fill_nan(None)
 
-    df = codegen_exec(df, _code_block_1, over_null=None).filter(~pl.col('paused'))
-    df = codegen_exec(df, _code_block_2, over_null="partition_by")
+    df = codegen_exec(df, _code_block_1, asset='code', date='time', over_null=None).filter(pl.col('paused') == 0)
+    df = codegen_exec(df, _code_block_2, asset='code', date='time', over_null="partition_by")
 
     df = df.drop(['sz50', 'hs300', 'zz500', 'zz1000'])
     # 计算出来的结果需要进行部分修复，防止之后计算时出错
@@ -118,6 +121,11 @@ def main():
     PATH_INPUT1 = r'F:\preprocessing\data1.parquet'
     df = step1(PATH_INPUT1)
     df = step2(df)
+
+    # 最后才调整大小
+    df = df.select(cs.all().shrink_dtype())
+    df = df.shrink_to_fit()
+
     print(df.tail())
     df.write_parquet(PATH_OUTPUT / 'data2.parquet')
 

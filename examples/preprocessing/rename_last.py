@@ -22,10 +22,10 @@ def get_paths(root):
         (rf'{root}\get_price_stock_daily', False),
         #
         # # ignore_index=True 表示合并时丢弃索引，因为索引不含有效信息
-        # (rf'{root}\get_fundamentals_balance', True),
-        # (rf'{root}\get_fundamentals_cash_flow', True),
-        # (rf'{root}\get_fundamentals_income', True),
-        # (rf'{root}\get_fundamentals_indicator', True),
+        (rf'{root}\get_fundamentals_balance', True),
+        (rf'{root}\get_fundamentals_cash_flow', True),
+        (rf'{root}\get_fundamentals_income', True),
+        (rf'{root}\get_fundamentals_indicator', True),
         (rf'{root}\get_fundamentals_valuation', True),
         # (rf'{root}\get_STK_XR_XD', True),
         # (rf'{root}\get_STK_BALANCE_SHEET', True),

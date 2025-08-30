@@ -5,7 +5,6 @@
 import pathlib
 
 import polars as pl
-import polars.selectors as cs
 from loguru import logger
 
 
@@ -27,8 +26,13 @@ def step1(ROOT) -> pl.DataFrame:
     PATH_INPUT9 = rf'{ROOT}\get_index_weights\000852.XSHG'
 
     # 多文件加载
-    df1 = pl.read_parquet(PATH_INPUT1, use_pyarrow=True).with_columns(pl.col('paused').cast(pl.Boolean)).drop(
-        ['__index_level_0__'])
+    df1 = (
+        pl.read_parquet(PATH_INPUT1, use_pyarrow=True)
+        # .with_columns(pl.col('paused').cast(pl.Boolean))
+        .drop(['__index_level_0__'])
+        .sort(by=['code', 'time'])
+    )
+
     df2 = (
         pl.read_parquet(PATH_INPUT2, use_pyarrow=True)
         .rename({'__index_level_0__': 'code', 'start_date': 'ipo_date'})
@@ -40,7 +44,8 @@ def step1(ROOT) -> pl.DataFrame:
     df3 = pl.read_parquet(PATH_INPUT3, use_pyarrow=True, columns=['time', 'code', 'is_st'])
     # 行业分类
     df4 = (
-        pl.read_parquet(PATH_INPUT4, use_pyarrow=True).rename({'date': 'time', '__index_level_0__': 'code'})
+        pl.read_parquet(PATH_INPUT4, use_pyarrow=True)
+        .rename({'date': 'time', '__index_level_0__': 'code'})
         .filter(pl.col('is_code')).drop('is_code')
         .with_columns(
             pl.col('sw_l1', 'sw_l2', 'sw_l3').cast(pl.UInt32),
@@ -49,27 +54,36 @@ def step1(ROOT) -> pl.DataFrame:
     )
     # 估值
     df5 = (
-        pl.read_parquet(PATH_INPUT5, use_pyarrow=True).rename({'day': 'time'})
+        pl.read_parquet(PATH_INPUT5, use_pyarrow=True)
+        .rename({'day': 'time'})
         .drop(['id', 'pubDate', '__index_level_0__'])
         .with_columns(pl.col('time').str.strptime(pl.Datetime, "%Y-%m-%d"))
     )
 
     # 指数权重
     df6 = (
-        pl.read_parquet(PATH_INPUT6, use_pyarrow=True).rename({'date': 'time', 'weight': 'sz50'})
+        pl.read_parquet(PATH_INPUT6, use_pyarrow=True)
+        .rename({'date': 'time', 'weight': 'sz50'})
         .with_columns(pl.col('time').cast(pl.Datetime('us')))
+        .drop('display_name')
     )
     df7 = (
-        pl.read_parquet(PATH_INPUT7, use_pyarrow=True).rename({'date': 'time', 'weight': 'hs300'})
+        pl.read_parquet(PATH_INPUT7, use_pyarrow=True)
+        .rename({'date': 'time', 'weight': 'hs300'})
         .with_columns(pl.col('time').cast(pl.Datetime('us')))
+        .drop('display_name')
     )
     df8 = (
-        pl.read_parquet(PATH_INPUT8, use_pyarrow=True).rename({'date': 'time', 'weight': 'zz500'})
+        pl.read_parquet(PATH_INPUT8, use_pyarrow=True)
+        .rename({'date': 'time', 'weight': 'zz500'})
         .with_columns(pl.col('time').cast(pl.Datetime('us')))
+        .drop('display_name')
     )
     df9 = (
-        pl.read_parquet(PATH_INPUT9, use_pyarrow=True).rename({'date': 'time', 'weight': 'zz1000'})
+        pl.read_parquet(PATH_INPUT9, use_pyarrow=True)
+        .rename({'date': 'time', 'weight': 'zz1000'})
         .with_columns(pl.col('time').cast(pl.Datetime('us')))
+        .drop('display_name')
     )
 
     # 排序，合并时能提速
@@ -78,10 +92,10 @@ def step1(ROOT) -> pl.DataFrame:
     df3 = df3.sort(by=['code', 'time'])
     df4 = df4.sort(by=['code', 'time'])
     df5 = df5.sort(by=['code', 'time'])
-    df6 = df6.sort(by=['code', 'time']).drop('display_name')
-    df7 = df7.sort(by=['code', 'time']).drop('display_name')
-    df8 = df8.sort(by=['code', 'time']).drop('display_name')
-    df9 = df9.sort(by=['code', 'time']).drop('display_name')
+    df6 = df6.sort(by=['code', 'time'])
+    df7 = df7.sort(by=['code', 'time'])
+    df8 = df8.sort(by=['code', 'time'])
+    df9 = df9.sort(by=['code', 'time'])
 
     # 多表合并
     dd = (
@@ -101,18 +115,10 @@ def step1(ROOT) -> pl.DataFrame:
     return dd
 
 
-def func_ts(df: pl.DataFrame) -> pl.DataFrame:
-    df = df.sort(by=['time'])
-    df = df.with_columns([
-        pl.col('sw_l1', 'sw_l2', 'sw_l3', 'zjw').forward_fill().backward_fill(),
-    ])
-    return df
-
-
 def step2(df: pl.DataFrame) -> pl.DataFrame:
-    df = df.group_by('code').map_groups(func_ts)
-    df = df.select(cs.all().shrink_dtype())
-    df = df.shrink_to_fit()
+    df = df.sort('code', 'time').with_columns(
+        pl.col('sw_l1', 'sw_l2', 'sw_l3', 'zjw').forward_fill().backward_fill().over('code', order_by='time')
+    )
     return df
 
 
@@ -123,7 +129,8 @@ def main():
     PATH_OUTPUT.mkdir(parents=True, exist_ok=True)
 
     logger.info('start process')
-    ROOT = r"M:\data\jqresearch"
+    ROOT = r"F:\data\jqresearch"
+
     df = step1(ROOT)
     df = step2(df)
 

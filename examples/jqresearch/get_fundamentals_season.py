@@ -38,7 +38,7 @@ def main():
             d.set_parameters(func_name,
                              end_date=dr,
                              statDate=q)
-            if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 150):
+            if not d.exists(file_timeout=1800, data_timeout=86400 * 150):
                 # print(dr, q)
                 d.download(kw=['statDate'])
                 d.save()
