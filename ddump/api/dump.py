@@ -11,12 +11,13 @@ API接口数据下载工具
 
 
 """
-
+import logging
 import pathlib
+from typing import List
 
 import pandas as pd
 from loguru import logger
-from tenacity import retry, wait_fixed
+from tenacity import retry, before_sleep_log, wait_random
 
 from .common import FILE_SUFFIX
 from ..api.common import (
@@ -51,7 +52,7 @@ class Dump:
     # 命名参数
     kwargs = {}
 
-    def __init__(self, api, path, file_names):
+    def __init__(self, api, path: str, file_names: List[str]):
         """初始化
 
         Parameters
@@ -78,7 +79,7 @@ class Dump:
         # self.args = ()
         # self.kwargs = {}
 
-    def set_parameters(self, func_name, *args, **kwargs):
+    def set_parameters(self, func_name: str, *args, **kwargs) -> None:
         """设置查询参数
 
         不同API不同，需要定制重载
@@ -103,7 +104,7 @@ class Dump:
             self.file_path = None
         pass
 
-    def exists(self, timeout):
+    def exists(self, timeout: int) -> bool:
         """检查文件是否存在，防止重复下载
 
         Parameters
@@ -133,16 +134,21 @@ class Dump:
             else:
                 return False
 
-    @retry(wait=wait_fixed(15))  # , stop=stop_after_attempt(3)，好像是全局3次
-    def download(self, kw, post_download=func_post_download, post_download_kwargs={}):
+    @retry(wait=wait_random(10, 20), before_sleep=before_sleep_log(logger, logging.DEBUG))
+    async def download(self, use_await: bool, kw: List[str], post_download=func_post_download, post_download_kwargs={}):
         """下载动作。每个API的函数与参数不同，需定制重载
+
+        Parameters
+        ----------
+        use_await: bool
+            所调用的API是同步函数还是异步函数
+        kw:
+            需要传送的参数。None表示全传
 
         Returns
         -------
         pd.DataFrame
             查询的数据
-        kw:
-            需要传送的参数。None表示全传
 
         Notes
         -----
@@ -159,7 +165,10 @@ class Dump:
         df = read_obj(key)
         if df is None:
             api = getattr(self.api, self.func_name)
-            df = api(*self.args, **_kwargs)
+            if use_await:
+                df = await api(*self.args, **_kwargs)
+            else:
+                df = api(*self.args, **_kwargs)
             if isinstance(df, dict):
                 if df.get('status', 200) != 200:
                     logger.error(f'{df}')
