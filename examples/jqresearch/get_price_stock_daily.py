@@ -1,7 +1,12 @@
+import asyncio
+
 import pandas as pd
+from ksrpc.client import RpcClient
+from ksrpc.connections.websocket import WebSocketConnection
 
 from ddump.api.dump import Dump__start__end
-from examples.jqresearch.config import DATA_ROOT, jq, DATA_ROOT_AKSHARE
+from examples.jqresearch.config import DATA_ROOT, DATA_ROOT_AKSHARE
+from examples.jqresearch.config import URL, USERNAME, PASSWORD, JQA_MODULE
 
 """
 行情数据
@@ -19,14 +24,14 @@ fq1 = None
 fq2 = 'post'
 
 
-def do_get_price(d, start_date, end_date, symbols, fields, fq):
+async def do_get_price(d, start_date, end_date, symbols, fields, fq):
     # 下载日线数据
     d.set_parameters('get_price',
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist(), fq=fq, panel=False, fields=fields)
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         # print(start_date, end_date)
-        d.download(kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields'])
+        await d.download(use_await=True, kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields'])
         d.save()
 
 
@@ -36,7 +41,7 @@ def save_func_get_extras(df: pd.DataFrame):
     return df[df['is_st']]
 
 
-def do_get_extras(d, start_date, end_date, symbols, info):
+async def do_get_extras(d, start_date, end_date, symbols, info):
     # 下载日线数据
     d.set_parameters('get_extras',
                      info=info,
@@ -44,7 +49,7 @@ def do_get_extras(d, start_date, end_date, symbols, info):
                      security_list=symbols.index.tolist(), df=True)
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         # print(start_date, end_date)
-        d.download(kw=['info', 'start_date', 'end_date', 'security_list', 'df'])
+        await d.download(use_await=True, kw=['info', 'start_date', 'end_date', 'security_list', 'df'])
         d.save(pre_save=save_func_get_extras)
 
 
@@ -68,7 +73,7 @@ def save_func_get_industry(df, date):
     return df
 
 
-def do_get_industry(d, start_date, end_date, symbols):
+async def do_get_industry(d, start_date, end_date, symbols):
     # 下载日线数据
     d.set_parameters('get_industry',
                      start_date=f'{start_date:%Y-%m-%d}',
@@ -77,11 +82,11 @@ def do_get_industry(d, start_date, end_date, symbols):
                      security=symbols.index.tolist())
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         # print(start_date, end_date)
-        d.download(kw=['security', 'date'])
+        await d.download(use_await=True, kw=['security', 'date'])
         d.save(pre_save=save_func_get_industry, pre_save_kwargs={'date': end_date})
 
 
-def main():
+async def download(jqa):
     types = 'stock'
     universe = pd.read_parquet(DATA_ROOT / 'get_all_securities' / f'{types}.parquet')
 
@@ -89,10 +94,10 @@ def main():
     path2 = DATA_ROOT / f'get_price_{types}_factor'
     path3 = DATA_ROOT / f'get_extras_{types}_is_st'
     path4 = DATA_ROOT / f'get_industry_{types}'
-    d1 = Dump__start__end(jq, path1, 'start_date', 'end_date')
-    d2 = Dump__start__end(jq, path2, 'start_date', 'end_date')
-    d3 = Dump__start__end(jq, path3, 'start_date', 'end_date')
-    d4 = Dump__start__end(jq, path4, 'start_date', 'end_date')
+    d1 = Dump__start__end(jqa, path1, 'start_date', 'end_date')
+    d2 = Dump__start__end(jqa, path2, 'start_date', 'end_date')
+    d3 = Dump__start__end(jqa, path3, 'start_date', 'end_date')
+    d4 = Dump__start__end(jqa, path4, 'start_date', 'end_date')
 
     # 加载交易日历
     trading_day = pd.read_parquet(DATA_ROOT_AKSHARE / 'tool_trade_date_hist_sina' / f'calendar.parquet')
@@ -114,10 +119,20 @@ def main():
     for start_date, end_date in zip(start_list, end_list):
         symbols = universe.query(f'start_date<=@end_date and end_date>=@start_date')
 
-        do_get_price(d1, start_date, end_date, symbols, fields1, fq1)
-        do_get_price(d2, start_date, end_date, symbols, fields2, fq2)
-        do_get_extras(d3, start_date, end_date, symbols, 'is_st')
-        do_get_industry(d4, start_date, end_date, symbols)
+        await do_get_price(d1, start_date, end_date, symbols, fields1, fq1)
+        await do_get_price(d2, start_date, end_date, symbols, fields2, fq2)
+        await do_get_extras(d3, start_date, end_date, symbols, 'is_st')
+        await do_get_industry(d4, start_date, end_date, symbols)
+
+
+async def async_main():
+    async with WebSocketConnection(URL, username=USERNAME, password=PASSWORD) as conn:
+        jqa = RpcClient(JQA_MODULE, conn)
+        await download(jqa)
+
+
+def main():
+    asyncio.run(async_main())
 
 
 if __name__ == '__main__':

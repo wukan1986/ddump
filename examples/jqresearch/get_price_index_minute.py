@@ -1,8 +1,13 @@
+import asyncio
+
 import more_itertools
 import pandas as pd
+from ksrpc.client import RpcClient
+from ksrpc.connections.websocket import WebSocketConnection
 
 from ddump.api.dump import Dump__start__end
-from examples.jqresearch.config import DATA_ROOT, jq, DATA_ROOT_AKSHARE
+from examples.jqresearch.config import DATA_ROOT, DATA_ROOT_AKSHARE
+from examples.jqresearch.config import URL, USERNAME, PASSWORD, JQA_MODULE
 
 """
 行情数据
@@ -18,7 +23,7 @@ fields1 = ['open', 'close', 'high', 'low', 'volume', 'money']
 fq1 = None
 
 
-def do_get_price(d, start_date, end_date, symbols, fields, fq):
+async def do_get_price(d, start_date, end_date, symbols, fields, fq):
     # 下载分钟数据，由于数据量太大，需要分批下载
     symbols_list = symbols.copy()
     d.set_parameters('get_price',
@@ -31,7 +36,8 @@ def do_get_price(d, start_date, end_date, symbols, fields, fq):
             d.set_parameters('get_price',
                              start_date=f'{start_date:%Y-%m-%d} 08:00:00', end_date=f'{end_date:%Y-%m-%d} 16:00:00',
                              security=syms, fq=fq, panel=False, fields=fields, frequency='1m')
-            d.download(kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields', 'frequency'])
+            await d.download(use_await=True,
+                             kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields', 'frequency'])
         d.save()
 
 
@@ -51,11 +57,11 @@ symbols = [
 ]
 
 
-def main():
+async def download(jqa):
     types = 'index'
 
     path = DATA_ROOT / f'get_price_{types}_minute'
-    d = Dump__start__end(jq, path, 'start_date', 'end_date')
+    d = Dump__start__end(jqa, path, 'start_date', 'end_date')
 
     # 加载交易日历
     trading_day = pd.read_parquet(DATA_ROOT_AKSHARE / 'tool_trade_date_hist_sina' / f'calendar.parquet')
@@ -75,7 +81,17 @@ def main():
 
     # 下载数据
     for start_date, end_date in zip(start_list, end_list):
-        do_get_price(d, start_date, end_date, symbols, fields1, fq1)
+        await do_get_price(d, start_date, end_date, symbols, fields1, fq1)
+
+
+async def async_main():
+    async with WebSocketConnection(URL, username=USERNAME, password=PASSWORD) as conn:
+        jqa = RpcClient(JQA_MODULE, conn)
+        await download(jqa)
+
+
+def main():
+    asyncio.run(async_main())
 
 
 if __name__ == '__main__':

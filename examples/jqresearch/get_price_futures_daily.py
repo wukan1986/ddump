@@ -1,7 +1,12 @@
+import asyncio
+
 import pandas as pd
+from ksrpc.client import RpcClient
+from ksrpc.connections.websocket import WebSocketConnection
 
 from ddump.api.dump import Dump__start__end
-from examples.jqresearch.config import DATA_ROOT, jq, jqr, DATA_ROOT_AKSHARE
+from examples.jqresearch.config import DATA_ROOT, DATA_ROOT_AKSHARE
+from examples.jqresearch.config import URL, USERNAME, PASSWORD, JQA_MODULE, JQR_MODULE
 
 """
 行情数据
@@ -13,18 +18,19 @@ from examples.jqresearch.config import DATA_ROOT, jq, jqr, DATA_ROOT_AKSHARE
 
 # 下载日线数据
 # 下载复权因子
-fields1 = ['open', 'close', 'low', 'high', 'volume', 'money', 'high_limit', 'low_limit', 'avg', 'pre_close', 'open_interest']
+fields1 = ['open', 'close', 'low', 'high', 'volume', 'money', 'high_limit', 'low_limit', 'avg', 'pre_close',
+           'open_interest']
 fq1 = None
 
 
-def do_get_price(d, start_date, end_date, symbols, fields, fq):
+async def do_get_price(d, start_date, end_date, symbols, fields, fq):
     # 下载日线数据
     d.set_parameters('get_price',
                      start_date=f'{start_date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}',
                      security=symbols.index.tolist(), fq=fq, panel=False, fields=fields)
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         # print(start_date, end_date)
-        d.download(kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields'])
+        await d.download(use_await=True, kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields'])
         d.save()
 
 
@@ -37,26 +43,27 @@ def post_download_get_dominant_futures(df, end_date):
     return df
 
 
-def do_get_dominant_futures(d, date, end_date, symbols):
+async def do_get_dominant_futures(d, date, end_date, symbols):
     d.set_parameters('get_dominant_futures_all',
                      symbols=symbols,
                      date=f'{date:%Y-%m-%d}', end_date=f'{end_date:%Y-%m-%d}')
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 2):
         # print(date, end_date)
-        d.download(kw=['symbols', 'date', 'end_date'],
-                   post_download=post_download_get_dominant_futures,
-                   post_download_kwargs={'end_date': f'{end_date:%Y-%m-%d}'})
+        await d.download(use_await=True,
+                         kw=['symbols', 'date', 'end_date'],
+                         post_download=post_download_get_dominant_futures,
+                         post_download_kwargs={'end_date': f'{end_date:%Y-%m-%d}'})
         d.save()
 
 
-def main():
+async def download(jqa, jqr):
     types = 'futures'
     universe = pd.read_parquet(DATA_ROOT / 'get_all_securities' / f'{types}.parquet')
     universe['index'] = universe.index
     universe['product'] = universe['index'].str.extract(r'([A-Z]+)\d+')
 
     path1 = DATA_ROOT / f'get_price_{types}_daily'
-    d1 = Dump__start__end(jq, path1, 'start_date', 'end_date')
+    d1 = Dump__start__end(jqa, path1, 'start_date', 'end_date')
     path2 = DATA_ROOT / f'get_dominant_futures'
     d2 = Dump__start__end(jqr, path2, 'date', 'end_date')
 
@@ -81,9 +88,20 @@ def main():
         # print(start_date, end_date)
         symbols = universe.query(f'start_date<=@end_date and end_date>=@start_date')
 
-        do_get_price(d1, start_date, end_date, symbols, fields1, fq1)
+        await do_get_price(d1, start_date, end_date, symbols, fields1, fq1)
         symbols_list = sorted(symbols['product'].unique())
-        do_get_dominant_futures(d2, start_date, end_date, symbols_list)
+        await do_get_dominant_futures(d2, start_date, end_date, symbols_list)
+
+
+async def async_main():
+    async with WebSocketConnection(URL, username=USERNAME, password=PASSWORD) as conn:
+        jqa = RpcClient(JQA_MODULE, conn)
+        jqr = RpcClient(JQR_MODULE, conn)
+        await download(jqa, jqr)
+
+
+def main():
+    asyncio.run(async_main())
 
 
 if __name__ == '__main__':

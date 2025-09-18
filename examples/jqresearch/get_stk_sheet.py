@@ -1,9 +1,13 @@
+import asyncio
 from datetime import datetime
 
 import pandas as pd
+from ksrpc.client import RpcClient
+from ksrpc.connections.websocket import WebSocketConnection
 
 from ddump.api.dump import Dump__date
-from examples.jqresearch.config import DATA_ROOT, jqr
+from examples.jqresearch.config import DATA_ROOT
+from examples.jqresearch.config import URL, USERNAME, PASSWORD, JQR_MODULE
 
 """
 原始报表下载
@@ -17,7 +21,7 @@ from examples.jqresearch.config import DATA_ROOT, jqr
 """
 
 
-def main():
+async def download(jqr):
     for func_name in [
         "get_STK_BALANCE_SHEET",
         "get_STK_INCOME_STATEMENT",
@@ -36,8 +40,18 @@ def main():
                              pub_date=q)
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 90):
                 # print(dr, q)
-                d.download(kw=['pub_date'])
+                await d.download(use_await=True, kw=['pub_date'])
                 d.save()
+
+
+async def async_main():
+    async with WebSocketConnection(URL, username=USERNAME, password=PASSWORD) as conn:
+        jqr = RpcClient(JQR_MODULE, conn)
+        await download(jqr)
+
+
+def main():
+    asyncio.run(async_main())
 
 
 if __name__ == '__main__':

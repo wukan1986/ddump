@@ -1,8 +1,13 @@
+import asyncio
+
 import pandas as pd
 from dateutil.relativedelta import relativedelta
+from ksrpc.client import RpcClient
+from ksrpc.connections.websocket import WebSocketConnection
 
 from ddump.api.dump import Dump__date
-from examples.jqresearch.config import DATA_ROOT, jq, DATA_ROOT_AKSHARE
+from examples.jqresearch.config import DATA_ROOT, DATA_ROOT_AKSHARE
+from examples.jqresearch.config import JQA_MODULE, PASSWORD, USERNAME, URL
 
 """
 指数权重
@@ -10,7 +15,7 @@ from examples.jqresearch.config import DATA_ROOT, jq, DATA_ROOT_AKSHARE
 """
 
 
-def main():
+async def download(jqa):
     # 加载交易日历
     trading_day = pd.read_parquet(DATA_ROOT_AKSHARE / 'tool_trade_date_hist_sina' / f'calendar.parquet')
     trading_day = trading_day['trade_date']
@@ -35,13 +40,23 @@ def main():
         # "399852.XSHE",  # 中证1000
     ]:
         path = DATA_ROOT / func_name / index_id
-        d = Dump__date(jq, path, 'date')
+        d = Dump__date(jqa, path, 'date')
         for i, date in enumerate(trading_day):
             d.set_parameters(func_name, index_id=index_id, date=f'{date:%Y-%m-%d}')
             if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 3):
                 # print(index_id, date)
-                d.download(kw=['index_id', 'date'])
+                await d.download(use_await=True, kw=['index_id', 'date'])
                 d.save()
+
+
+async def async_main():
+    async with WebSocketConnection(URL, username=USERNAME, password=PASSWORD) as conn:
+        jqa = RpcClient(JQA_MODULE, conn)
+        await download(jqa)
+
+
+def main():
+    asyncio.run(async_main())
 
 
 if __name__ == '__main__':
