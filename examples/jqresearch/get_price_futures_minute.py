@@ -24,7 +24,7 @@ async def do_get_price(d, start_date, end_date, symbols, fields, fq):
                      security=symbols_list, fq=fq, panel=False, fields=fields, frequency='1m')
     if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 1):
         # print(start_date, end_date)
-        sym_iter = more_itertools.batched(symbols_list, 300)
+        sym_iter = more_itertools.batched(symbols_list, 250)
         for syms in sym_iter:
             d.set_parameters('get_price',
                              start_date=f'{start_date:%Y-%m-%d} 20:00:00', end_date=f'{end_date:%Y-%m-%d} 16:00:00',
