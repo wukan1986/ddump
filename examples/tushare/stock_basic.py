@@ -1,8 +1,4 @@
 import asyncio
-import logging
-
-from loguru import logger
-from tenacity import retry, stop_after_attempt, wait_random, before_sleep_log
 
 from ddump.api.dump import Dump
 from examples.tushare.config import DATA_ROOT, pro
@@ -13,7 +9,6 @@ from examples.tushare.config import DATA_ROOT, pro
 """
 
 
-@retry(wait=wait_random(10, 20), stop=stop_after_attempt(3), before_sleep=before_sleep_log(logger, logging.DEBUG))
 async def download(pro):
     path = DATA_ROOT / 'stock_basic'
     d = Dump(pro, path, file_names=['list_status'])

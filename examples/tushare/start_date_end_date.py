@@ -1,9 +1,6 @@
 import asyncio
-import logging
 
 import pandas as pd
-from loguru import logger
-from tenacity import retry, stop_after_attempt, wait_random, before_sleep_log
 
 from ddump.api.dump import Dump__start__end
 from examples.tushare.config import DATA_ROOT, pro
@@ -15,7 +12,6 @@ start_date/end_date是根据ann_date来的，但早期记录没有ann_date，所
 """
 
 
-@retry(wait=wait_random(10, 20), stop=stop_after_attempt(3), before_sleep=before_sleep_log(logger, logging.DEBUG))
 async def download(pro):
     end = f"{pd.to_datetime('today'):%Y-%m-%d}"
 

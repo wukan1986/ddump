@@ -1,15 +1,11 @@
 import asyncio
-import logging
 
 import pandas as pd
-from loguru import logger
-from tenacity import retry, stop_after_attempt, wait_random, before_sleep_log
 
 from ddump.api.dump import Dump__date
 from examples.tushare.config import DATA_ROOT, pro
 
 
-@retry(wait=wait_random(10, 20), stop=stop_after_attempt(3), before_sleep=before_sleep_log(logger, logging.DEBUG))
 async def download(pro):
     end = f"{pd.to_datetime('today') - pd.Timedelta(hours=15, minutes=30):%Y-%m-%d}"
     # 加载交易日历
