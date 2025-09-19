@@ -1,11 +1,16 @@
-import time
+import asyncio
+import logging
 
 import pandas as pd
+from loguru import logger
+from tenacity import retry, stop_after_attempt, wait_random, before_sleep_log
 
 from ddump.api.dump import Dump__date
 from examples.tushare.config import DATA_ROOT, pro
 
-if __name__ == '__main__':
+
+@retry(wait=wait_random(10, 20), stop=stop_after_attempt(3), before_sleep=before_sleep_log(logger, logging.DEBUG))
+async def download(pro):
     end = f"{pd.to_datetime('today') - pd.Timedelta(hours=15, minutes=30):%Y-%m-%d}"
     # 加载交易日历
     trading_day = pd.read_parquet(DATA_ROOT / 'trade_cal' / f'SSE.parquet')
@@ -26,7 +31,19 @@ if __name__ == '__main__':
         for i, trade_date in enumerate(trading_day):
             d.set_parameters(func_name, trade_date=trade_date)
             if not d.exists(file_timeout=3600 * 4, data_timeout=86400 * 2):
-                d.download(kw=['trade_date'])
+                await d.download(use_await=False, kw=['trade_date'])
                 d.save()
                 if i % n == n - 1:
-                    time.sleep(m)
+                    await asyncio.sleep(m)
+
+
+async def async_main():
+    await download(pro)
+
+
+def main():
+    asyncio.run(async_main())
+
+
+if __name__ == '__main__':
+    main()
