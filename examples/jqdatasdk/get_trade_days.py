@@ -1,7 +1,9 @@
+import asyncio
+
 import pandas as pd
 
-from examples.jqdatasdk.config import jq, DATA_ROOT
 from ddump.api.dump import Dump__start__end
+from examples.jqdatasdk.config import DATA_ROOT, jq
 
 
 class Wrapper:
@@ -13,7 +15,7 @@ class Wrapper:
         return pd.DataFrame(pd.to_datetime(arr), columns=['date'])
 
 
-if __name__ == '__main__':
+async def download():
     start = '2005-01-01'
     end = f"{pd.to_datetime('today'):%Y-%m-%d}"
 
@@ -24,5 +26,17 @@ if __name__ == '__main__':
         end_date = f'{dr:%Y}-12-31'
         d.set_parameters('get_trade_days', start_date=start_date, end_date=end_date)
         if not d.exists(file_timeout=86400 - 3600, data_timeout=86400 * 10):
-            d.download()
-            d.save(save_empty=True)
+            await d.download(use_await=False, kw=['start_date', 'end_date'])
+            d.save()
+
+
+async def async_main():
+    await download()
+
+
+def main():
+    asyncio.run(async_main())
+
+
+if __name__ == '__main__':
+    main()

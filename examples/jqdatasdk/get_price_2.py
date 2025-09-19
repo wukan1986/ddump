@@ -1,9 +1,11 @@
+import asyncio
+
 import pandas as pd
 
-from examples.jqdatasdk.config import DATA_ROOT, jq
 from ddump.api.common import get_last_file
 from ddump.api.dump import Dump__start__end
 from ddump.common import FILE_SUFFIX
+from examples.jqdatasdk.config import DATA_ROOT, jq
 
 """
 行情数据
@@ -14,7 +16,8 @@ from ddump.common import FILE_SUFFIX
 """
 from datetime import datetime
 
-if __name__ == '__main__':
+
+async def download(jq):
     func_name = 'get_price'
     today = pd.to_datetime(datetime.today().date())
     today = pd.to_datetime('2020-01-01')
@@ -50,7 +53,20 @@ if __name__ == '__main__':
                                  start_date=start_date, end_date=end_date,
                                  security=symbol, fq=None, panel=False, fields=fields)
                 if not d.exists(file_timeout=86400 * 1, data_timeout=86400 * 10):
-                    d.download()
-                    d.save(save_empty=True)
+                    await d.download(use_await=False,
+                                     kw=['start_date', 'end_date', 'security', 'fq', 'panel', 'fields'])
+                    d.save()
             # 测试用，在第一支股票后就跳出
             # break
+
+
+async def async_main():
+    await download(jq)
+
+
+def main():
+    asyncio.run(async_main())
+
+
+if __name__ == '__main__':
+    main()

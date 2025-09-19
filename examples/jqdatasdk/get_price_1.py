@@ -1,7 +1,9 @@
+import asyncio
+
 import pandas as pd
 
-from examples.jqdatasdk.config import jq, DATA_ROOT
 from ddump.api.dump import Dump__start__end
+from examples.jqdatasdk.config import jq, DATA_ROOT
 
 """
 演示按年下载历史数据
@@ -11,7 +13,8 @@ from ddump.api.dump import Dump__start__end
 
 """
 
-if __name__ == '__main__':
+
+async def download(jq):
     for func_name in [
         'get_price',
     ]:
@@ -33,5 +36,18 @@ if __name__ == '__main__':
                                  start_date=start_date, end_date=end_date,
                                  security=select.index.tolist(), fq=None, panel=False)
                 if not d.exists(file_timeout=86400 * 1, data_timeout=86400 * 10):
-                    d.download()
-                    d.save(save_empty=True)
+                    await d.download(use_await=False,
+                                     kw=['start_date', 'end_date', 'security', 'fq', 'panel'])
+                    d.save()
+
+
+async def async_main():
+    await download(jq)
+
+
+def main():
+    asyncio.run(async_main())
+
+
+if __name__ == '__main__':
+    main()
