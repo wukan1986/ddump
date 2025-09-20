@@ -26,7 +26,7 @@ def get_key(func_name, args, kwargs, ext):
     kwargs_str = pickle.dumps(kwargs)
 
     # 组合函数名和参数
-    key_str = func_name.encode() + b':' + args_str + b':' + kwargs_str
+    key_str = func_name.encode("utf-8") + b':' + args_str + b':' + kwargs_str
 
     # 计算 MD5
     return TEMP_DIR / (hashlib.md5(key_str).hexdigest() + ext)

@@ -169,14 +169,14 @@ class Dump:
                     logger.error(f'{df}')
                     raise
             write_obj(df, key)
-            # logger.info('写入缓存 {} {}', self.func_name, key)
+            if len(df) < 30:
+                logger.warning('写入缓存 {}/{} {} {}', len(df), len(self.dfs), self.func_name, key)
         else:
-            logger.info('命中缓存 {} {}', self.func_name, key)
+            logger.info('命中缓存 {}/{} {} {}', len(df), len(self.dfs), self.func_name, key)
         if df is not None:
             df = post_download(df, **post_download_kwargs)
             self.dfs[key] = df
 
-        # logger.info('数据量 {} {} {} {}', len(self.df), self.func_name, self.args, self.kwargs)
         return self.dfs
 
     def save(self, pre_save=func_pre_save, pre_save_kwargs={}):
@@ -194,17 +194,20 @@ class Dump:
         df = pd.concat(dfs) if len(dfs) > 0 else pd.DataFrame()
 
         self.path.mkdir(parents=True, exist_ok=True)
+
         # 保存
-        logger.info('保存 {} {} {}', len(df), self.func_name, self.file_path)
+        level = "WARNING" if len(df) < 30 else "INFO"
+        logger.log(level, '保存 {}/{} {} {}', len(df), len(dfs), self.func_name, self.file_path)
+
         try:
             df.to_parquet(self.file_path, compression='zstd')
             for k, v in self.dfs.items():
                 remove_obj(k)
-            self.dfs = {}
         except Exception as e:
             print(df)
-            self.dfs = {}
             raise e
+        finally:
+            self.dfs = {}
 
     def load(self):
         """加载数据"""
