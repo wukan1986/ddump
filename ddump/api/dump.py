@@ -73,11 +73,6 @@ class Dump:
     def reset(self):
         """重置"""
         self.dfs = {}
-        # self.file_path = None
-        # self.files_df = None
-        # self.func_name = None
-        # self.args = ()
-        # self.kwargs = {}
 
     def set_parameters(self, func_name: str, *args, **kwargs) -> None:
         """设置查询参数
@@ -143,7 +138,7 @@ class Dump:
         use_await: bool
             所调用的API是同步函数还是异步函数
         kw:
-            需要传送的参数。None表示全传
+            需要传送的参数
 
         Returns
         -------
@@ -196,7 +191,7 @@ class Dump:
 
         """
         dfs = [pre_save(df, **pre_save_kwargs) for key, df in self.dfs.items()]
-        df = pd.concat(dfs)
+        df = pd.concat(dfs) if len(dfs) > 0 else pd.DataFrame()
 
         self.path.mkdir(parents=True, exist_ok=True)
         # 保存
