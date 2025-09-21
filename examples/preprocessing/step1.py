@@ -29,7 +29,6 @@ def step1(ROOT) -> pl.DataFrame:
     df1 = (
         pl.read_parquet(PATH_INPUT1, use_pyarrow=True)
         # .with_columns(pl.col('paused').cast(pl.Boolean))
-        .drop(['__index_level_0__'])
         .sort(by=['code', 'time'])
     )
 
@@ -56,7 +55,7 @@ def step1(ROOT) -> pl.DataFrame:
     df5 = (
         pl.read_parquet(PATH_INPUT5, use_pyarrow=True)
         .rename({'day': 'time'})
-        .drop(['id', 'pubDate', '__index_level_0__'])
+        .drop(['id', 'pubDate'])
         .with_columns(pl.col('time').str.strptime(pl.Datetime, "%Y-%m-%d"))
     )
 

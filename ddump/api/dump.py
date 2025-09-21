@@ -191,7 +191,13 @@ class Dump:
 
         """
         dfs = [pre_save(df, **pre_save_kwargs) for key, df in self.dfs.items()]
-        df = pd.concat(dfs) if len(dfs) > 0 else pd.DataFrame()
+        if len(dfs) > 0:
+            if isinstance(dfs[0].index, pd.RangeIndex):
+                df = pd.concat(dfs, ignore_index=True)
+            else:
+                df = pd.concat(dfs)
+        else:
+            df = pd.DataFrame()
 
         self.path.mkdir(parents=True, exist_ok=True)
 

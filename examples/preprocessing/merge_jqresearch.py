@@ -19,29 +19,28 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def get_paths(root):
     return [
-        (rf'{root}\get_extras_stock_is_st', False),
-        (rf'{root}\get_industry_stock', False),
-        (rf'{root}\get_price_stock_factor', False),
-        (rf'{root}\get_price_stock_daily', False),
+        rf'{root}\get_extras_stock_is_st',
+        rf'{root}\get_industry_stock',
+        rf'{root}\get_price_stock_factor',
+        rf'{root}\get_price_stock_daily',
 
-        # ignore_index=True 表示合并时丢弃索引，因为索引不含有效信息
-        (rf'{root}\get_fundamentals_balance', True),
-        (rf'{root}\get_fundamentals_cash_flow', True),
-        (rf'{root}\get_fundamentals_income', True),
-        (rf'{root}\get_fundamentals_indicator', True),
-        (rf'{root}\get_fundamentals_valuation', True),
-        (rf'{root}\get_STK_XR_XD', True),
-        (rf'{root}\get_STK_BALANCE_SHEET', True),
-        (rf'{root}\get_STK_CASHFLOW_STATEMENT', True),
-        (rf'{root}\get_STK_INCOME_STATEMENT', True),
+        rf'{root}\get_fundamentals_balance',
+        rf'{root}\get_fundamentals_cash_flow',
+        rf'{root}\get_fundamentals_income',
+        rf'{root}\get_fundamentals_indicator',
+        rf'{root}\get_fundamentals_valuation',
+        rf'{root}\get_STK_XR_XD',
+        rf'{root}\get_STK_BALANCE_SHEET',
+        rf'{root}\get_STK_CASHFLOW_STATEMENT',
+        rf'{root}\get_STK_INCOME_STATEMENT',
 
-        (rf'{root}\get_index_weights\000016.XSHG', False),
-        (rf'{root}\get_index_weights\000300.XSHG', False),
-        (rf'{root}\get_index_weights\000852.XSHG', False),
-        (rf'{root}\get_index_weights\000905.XSHG', False),
+        rf'{root}\get_index_weights\000016.XSHG',
+        rf'{root}\get_index_weights\000300.XSHG',
+        rf'{root}\get_index_weights\000852.XSHG',
+        rf'{root}\get_index_weights\000905.XSHG',
 
-        (rf'{root}\get_price_futures_daily', False),
-        (rf'{root}\get_dominant_futures', False),
+        rf'{root}\get_price_futures_daily',
+        rf'{root}\get_dominant_futures',
     ]
 
 
@@ -53,12 +52,12 @@ def main():
 
     paths1 = get_paths(PATH_INPUT1)
     paths2 = get_paths(PATH_OUTPUT)
-    for (path1, _), (path2, _) in zip(paths1, paths2):
+    for path1, path2 in zip(paths1, paths2):
         logger.info('=' * 60, )
         path1 = pathlib.Path(path1)
         path2 = pathlib.Path(path2)
         files = path_groupby_date(path1, path2)
-        merge_files_dict(files, ignore_index=_, delete_src=False)
+        merge_files_dict(files, delete_src=False)
         remove_sub_range(path2)
 
 

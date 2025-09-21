@@ -8,7 +8,6 @@ from ddump.common import FILE_SUFFIX, START_SEP_END
 
 
 def merge_files_to_file(path, files,
-                        ignore_index=True,
                         delete_src=False,
                         single_overwrite=True):
     """合并件列表到文件
@@ -19,8 +18,6 @@ def merge_files_to_file(path, files,
         目标路径
     files: list of Path
         源路径列表
-    ignore_index: bool
-        合并时是否忽略索引。索引没有意义时忽略能加速
     delete_src: bool
         是否删除源文件
     single_overwrite: bool
@@ -64,14 +61,20 @@ def merge_files_to_file(path, files,
     # 合并,希望内存够
     logger.info('合并 {} 至 {} 等 {}个文件。是否删除?{}', h.name, t.name, len(files), delete_src)
     dfs = [d for d in dfs if not d.empty]
-    dfs = pd.concat(dfs, ignore_index=ignore_index)
+    if len(dfs) > 0:
+        if isinstance(dfs[0].index, pd.RangeIndex):
+            df = pd.concat(dfs, ignore_index=True)
+        else:
+            df = pd.concat(dfs)
+    else:
+        df = pd.DataFrame()
 
     file_temp = path.with_suffix('.tmp')
     logger.info('写入文件：{}', file_temp)
 
     # 写入临时文件
     path.parent.mkdir(parents=True, exist_ok=True)
-    dfs.to_parquet(file_temp, compression='zstd')
+    df.to_parquet(file_temp, compression='zstd')
 
     # 全删
     if delete_src:
@@ -84,8 +87,7 @@ def merge_files_to_file(path, files,
     file_temp.rename(path)
 
 
-def merge_files_dict(files_dict,
-                     ignore_index=False, delete_src=False):
+def merge_files_dict(files_dict, delete_src=False):
     """合并特殊字典。
 
     key为路径
@@ -94,7 +96,7 @@ def merge_files_dict(files_dict,
     for i, kv in enumerate(files_dict):
         # 最后N个单文件总是试着覆盖
         single_overwrite = i >= len(files_dict) - 3
-        merge_files_to_file(kv['to'], kv['from'], ignore_index, delete_src, single_overwrite)
+        merge_files_to_file(kv['to'], kv['from'], delete_src, single_overwrite)
 
 
 def check_include(start1, end1, start2, end2):
