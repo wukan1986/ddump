@@ -99,7 +99,7 @@ def step1(PATH_INPUT1) -> pl.DataFrame:
 def step2(df: pl.DataFrame) -> pl.DataFrame:
     df = df.fill_nan(None)
 
-    df = codegen_exec(df, _code_block_1, asset='code', date='time', over_null=None).filter(pl.col('paused') == 0)
+    df = codegen_exec(df, _code_block_1, asset='code', date='time', over_null=None)#.filter(pl.col('paused') == 0)
     df = codegen_exec(df, _code_block_2, asset='code', date='time', over_null="partition_by")
 
     df = df.drop(['sz50', 'hs300', 'zz500', 'zz1000'])
