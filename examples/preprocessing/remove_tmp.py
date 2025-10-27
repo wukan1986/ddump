@@ -3,6 +3,8 @@
 等到下载后，两个文件共存，此代码可删除tmp文件
 
 """
+from pathlib import Path
+
 import pandas as pd
 from loguru import logger
 
@@ -58,6 +60,10 @@ def remove(path):
 def main():
     # 源数据
     PATH_INPUT1 = r'D:\data\jqresearch'
+    p = Path(PATH_INPUT1) / "ddump.lock"
+    p.unlink(missing_ok=True)
+    logger.info("{} removed", p)
+
     paths = get_paths(PATH_INPUT1)
     for path, _ in paths:
         remove(path)

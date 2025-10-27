@@ -8,6 +8,8 @@
 注意：只有更新频率高的才需要此功能
 
 """
+from pathlib import Path
+
 from loguru import logger
 
 from ddump.api.common import get_last_file
@@ -55,6 +57,12 @@ def rename(path):
 def main():
     # 源数据
     PATH_INPUT1 = r'D:\data\jqresearch'
+    p = Path(PATH_INPUT1) / "ddump.lock"
+    if p.exists():
+        logger.info("{} already exists", p)
+        return
+    p.touch(exist_ok=True)
+
     paths = get_paths(PATH_INPUT1)
     for path, _ in paths:
         try:
