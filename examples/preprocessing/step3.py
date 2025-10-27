@@ -134,7 +134,9 @@ def main():
     df3 = df3.select(cs.all().shrink_dtype())
     df3 = df3.shrink_to_fit()
 
-    df3.write_parquet(PATH_OUTPUT / 'data4.parquet')
+    # 分成两个文件，只有最后一个文件需要上传到网络，方便同步数据
+    df3.filter(pl.col('time') < pl.date(2025, 9, 1)).write_parquet(PATH_OUTPUT / 'data4.parquet')
+    df3.filter(pl.col('time') >= pl.date(2025, 9, 1)).write_parquet(PATH_OUTPUT / 'data5.parquet')
     logger.info('done')
     print(df3.tail())
 
