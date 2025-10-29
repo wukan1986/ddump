@@ -18,31 +18,31 @@ from ddump.common import FILE_SUFFIX, TEMP_SUFFIX
 
 def get_paths(root):
     return [
-        (rf'{root}\get_extras_stock_is_st', False),
-        (rf'{root}\get_industry_stock', False),
-        (rf'{root}\get_price_stock_factor', False),
-        (rf'{root}\get_price_stock_daily', False),
-        #
-        # # ignore_index=True 表示合并时丢弃索引，因为索引不含有效信息
-        (rf'{root}\get_fundamentals_balance', True),
-        (rf'{root}\get_fundamentals_cash_flow', True),
-        (rf'{root}\get_fundamentals_income', True),
-        (rf'{root}\get_fundamentals_indicator', True),
-        (rf'{root}\get_fundamentals_valuation', True),
-        # (rf'{root}\get_STK_XR_XD', True),
-        # (rf'{root}\get_STK_BALANCE_SHEET', True),
-        # (rf'{root}\get_STK_CASHFLOW_STATEMENT', True),
-        # (rf'{root}\get_STK_INCOME_STATEMENT', True),
-        #
-        # (rf'{root}\get_index_weights\000016.XSHG', False),
-        # (rf'{root}\get_index_weights\000300.XSHG', False),
-        # (rf'{root}\get_index_weights\000852.XSHG', False),
-        # (rf'{root}\get_index_weights\000905.XSHG', False),
+        rf'{root}\get_extras_stock_is_st',
+        rf'{root}\get_industry_stock',
+        rf'{root}\get_price_stock_factor',
+        rf'{root}\get_price_stock_daily',
 
-        (rf'{root}\get_price_futures_daily', False),
-        (rf'{root}\get_dominant_futures', False),
+        rf'{root}\get_fundamentals_balance',
+        rf'{root}\get_fundamentals_cash_flow',
+        rf'{root}\get_fundamentals_income',
+        rf'{root}\get_fundamentals_indicator',
+        rf'{root}\get_fundamentals_valuation',
+        # rf'{root}\get_STK_XR_XD',
+        # rf'{root}\get_STK_BALANCE_SHEET',
+        # rf'{root}\get_STK_CASHFLOW_STATEMENT',
+        # rf'{root}\get_STK_INCOME_STATEMENT',
+        #
+        # rf'{root}\get_index_weights\000016.XSHG',
+        # rf'{root}\get_index_weights\000300.XSHG',
+        # rf'{root}\get_index_weights\000852.XSHG',
+        # rf'{root}\get_index_weights\000905.XSHG',
+        # rf'{root}\get_index_weights\932000.CSI',
 
-        (rf'{root}\get_index_daily', False),
+        rf'{root}\get_price_futures_daily',
+        rf'{root}\get_dominant_futures',
+
+        rf'{root}\get_index_daily',
     ]
 
 
@@ -64,7 +64,7 @@ def main():
     p.touch(exist_ok=True)
 
     paths = get_paths(PATH_INPUT1)
-    for path, _ in paths:
+    for path in paths:
         try:
             rename(path)
         except FileExistsError as e:

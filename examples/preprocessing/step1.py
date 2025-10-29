@@ -24,6 +24,7 @@ def step1(ROOT) -> pl.DataFrame:
     PATH_INPUT7 = rf'{ROOT}\get_index_weights\000300.XSHG'
     PATH_INPUT8 = rf'{ROOT}\get_index_weights\000905.XSHG'
     PATH_INPUT9 = rf'{ROOT}\get_index_weights\000852.XSHG'
+    PATH_INPUT10 = rf'{ROOT}\get_index_weights\932000.CSI'
 
     # 多文件加载
     df1 = (
@@ -84,6 +85,12 @@ def step1(ROOT) -> pl.DataFrame:
         .with_columns(pl.col('time').cast(pl.Datetime('us')))
         .drop('display_name')
     )
+    df10 = (
+        pl.read_parquet(PATH_INPUT9, use_pyarrow=True)
+        .rename({'date': 'time', 'weight': 'zz2000'})
+        .with_columns(pl.col('time').cast(pl.Datetime('us')))
+        .drop('display_name')
+    )
 
     # 排序，合并时能提速
     df1 = df1.sort(by=['code', 'time'])
@@ -95,6 +102,7 @@ def step1(ROOT) -> pl.DataFrame:
     df7 = df7.sort(by=['code', 'time'])
     df8 = df8.sort(by=['code', 'time'])
     df9 = df9.sort(by=['code', 'time'])
+    df10 = df10.sort(by=['code', 'time'])
 
     # 多表合并
     dd = (
@@ -107,6 +115,7 @@ def step1(ROOT) -> pl.DataFrame:
         .join(df7, on=['code', 'time'], how='left', coalesce=True)
         .join(df8, on=['code', 'time'], how='left', coalesce=True)
         .join(df9, on=['code', 'time'], how='left', coalesce=True)
+        .join(df10, on=['code', 'time'], how='left', coalesce=True)
     ).with_columns(
         pl.col('is_st').fill_null(False),
         total_days=(pl.col('time') - pl.col('ipo_date')).dt.total_days() + 1

@@ -38,6 +38,7 @@ def get_paths(root):
         rf'{root}\get_index_weights\000300.XSHG',
         rf'{root}\get_index_weights\000852.XSHG',
         rf'{root}\get_index_weights\000905.XSHG',
+        rf'{root}\get_index_weights\932000.CSI',
 
         rf'{root}\get_price_futures_daily',
         rf'{root}\get_dominant_futures',

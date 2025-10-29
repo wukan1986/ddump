@@ -24,6 +24,7 @@ def _code_block_1():
     CSI300 = cs_scale(ts_cum_prod_by(ROCR, cs_fill_except_all_null(hs300)), 100)
     CSI500 = cs_scale(ts_cum_prod_by(ROCR, cs_fill_except_all_null(zz500)), 100)
     CSI1000 = cs_scale(ts_cum_prod_by(ROCR, cs_fill_except_all_null(zz1000)), 100)
+    CSI2000 = cs_scale(ts_cum_prod_by(ROCR, cs_fill_except_all_null(zz2000)), 100)
 
 
 def _code_block_2():
@@ -102,7 +103,7 @@ def step2(df: pl.DataFrame) -> pl.DataFrame:
     df = codegen_exec(df, _code_block_1, asset='code', date='time', over_null=None)#.filter(pl.col('paused') == 0)
     df = codegen_exec(df, _code_block_2, asset='code', date='time', over_null="partition_by")
 
-    df = df.drop(['sz50', 'hs300', 'zz500', 'zz1000'])
+    df = df.drop(['sz50', 'hs300', 'zz500', 'zz1000', 'zz2000'])
     # 计算出来的结果需要进行部分修复，防止之后计算时出错
     df = df.with_columns(pl.col('NEXT_DOJI4').fill_null(False))
     # 将计算结果中的inf都换成null

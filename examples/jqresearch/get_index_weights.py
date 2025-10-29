@@ -24,6 +24,7 @@ async def download(jqa):
     # 上月底
     end = f"{pd.to_datetime('today') + relativedelta(months=-1, day=31):%Y-%m-%d}"
     start = f"{pd.to_datetime('today') + relativedelta(months=-3, day=31):%Y-%m-%d}"
+    # start = f"2014-01-01"
 
     trading_day = trading_day[start:end]
     trading_day = trading_day.resample('ME').last()
@@ -34,6 +35,7 @@ async def download(jqa):
         "000300.XSHG",  # 沪深300
         "000905.XSHG",  # 中证500
         "000852.XSHG",  # 中证1000
+        "932000.CSI",  # 中证2000
 
         # "399300.XSHE",  # 沪深300
         # "399905.XSHE",  # 中证500
