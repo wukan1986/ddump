@@ -74,8 +74,8 @@ def step1(ROOT) -> pl.DataFrame:
     PATH_INPUT_1 = rf'{ROOT}\get_fundamentals_balance'
     PATH_INPUT_2 = rf'{ROOT}\get_fundamentals_cash_flow'
     PATH_INPUT_3 = rf'{ROOT}\get_fundamentals_income'
-    # xx1 = load_financial(PATH_INPUT_1).filter(pl.col('code') == '603285.XSHG').sort('code', 'time')
-    # xx2 = load_financial(PATH_INPUT_2).filter(pl.col('code') == '603285.XSHG').sort('code', 'time')
+    # xx1 = load_financial(PATH_INPUT_1).filter(pl.col('code') == '600107.XSHG').sort('code', 'time')
+    # xx2 = load_financial(PATH_INPUT_2).filter(pl.col('code') == '600107.XSHG').sort('code', 'time')
 
     df1 = adjust_financial(load_financial(PATH_INPUT_1)).with_columns(__mask1__=1)
     df2 = adjust_financial(load_financial(PATH_INPUT_2)).with_columns(__mask2__=2)
@@ -135,8 +135,8 @@ def main():
     df3 = df3.shrink_to_fit()
 
     # 分成两个文件，只有最后一个文件需要上传到网络，方便同步数据
-    df3.filter(pl.col('time') < pl.date(2025, 9, 1)).write_parquet(PATH_OUTPUT / 'data4.parquet')
-    df3.filter(pl.col('time') >= pl.date(2025, 9, 1)).write_parquet(PATH_OUTPUT / 'data5.parquet')
+    df3.filter(pl.col('time') < pl.date(2025, 9, 1)).sort("code", "time").write_parquet(PATH_OUTPUT / 'data4.parquet')
+    df3.filter(pl.col('time') >= pl.date(2025, 9, 1)).sort("code", "time").write_parquet(PATH_OUTPUT / 'data5.parquet')
     logger.info('done')
     print(df3.tail())
 

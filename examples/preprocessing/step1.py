@@ -86,7 +86,7 @@ def step1(ROOT) -> pl.DataFrame:
         .drop('display_name')
     )
     df10 = (
-        pl.read_parquet(PATH_INPUT9, use_pyarrow=True)
+        pl.read_parquet(PATH_INPUT10, use_pyarrow=True)
         .rename({'date': 'time', 'weight': 'zz2000'})
         .with_columns(pl.col('time').cast(pl.Datetime('us')))
         .drop('display_name')
