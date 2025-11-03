@@ -56,16 +56,17 @@ def join_financial(df1: pl.DataFrame, df2: pl.DataFrame, by1: str = 'code', by2:
     # 收盘后公布会显示第二天，一周7天都可能公布。同一天能公布多期
     df2 = adjust_financial(df2, by1, by2, by3)
 
-    # 标记作表，然后全连接
+    # 标记行情表，然后全连接
     d1 = df1.with_columns(__left__=True).join(df2, on=[by1, by2], how='full', coalesce=True)
     # 财务数据forward_fill填充
     d0 = d1.sort(by1, by2).with_columns(
         pl.col(*df2.columns).forward_fill().over(by1, order_by=by2),
         # 周五收盘后公布，标记到周六，但没有周一行情承接，但不能直接丢弃，标记一下
-        __last__=pl.col('__left__').is_last_distinct().over(by1, order_by=by2),
+        __last__=pl.col('time').is_null().is_last_distinct().over(by1, order_by=by2),
     )
+    # xx = d0.filter(pl.col("code") == "002505.XSHE").select("code", "time", "close", "__left__", "__last__")
     # xx = d0.filter(pl.col('code') == '002721.XSHE', pl.col('time') >= datetime(2023, 4, 20))
-    d0 = d0.filter(pl.col('__left__').is_not_null() | pl.col('__last__'))
+    d0 = d0.filter(pl.col('__left__') | pl.col('__last__'))
     d0 = d0.drop('__left__', '__last__').fill_nan(None)
     return d0
 
@@ -119,10 +120,10 @@ def main():
     df2 = df2.select(cs.all().shrink_dtype())
     df2 = df2.shrink_to_fit()
 
-    logger.info('start write')
-    df2.write_parquet(PATH_OUTPUT / 'data3.parquet')
-    logger.info('done')
-    print(df2.tail())
+    # logger.info('start write')
+    # df2.write_parquet(PATH_OUTPUT / 'data3.parquet')
+    # logger.info('done')
+    # print(df2.tail())
 
     # TODO 涉及的字段太多，建议只取自己需要的字段用来合并
     df1 = pl.read_parquet(PATH_OUTPUT / 'data2.parquet')
