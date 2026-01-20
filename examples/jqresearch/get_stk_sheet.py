@@ -32,6 +32,7 @@ async def download(jqr):
         # 前半段，按周查，这样能快一些
         end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=91)
         start = pd.to_datetime(datetime.today().date()) - pd.Timedelta(days=183)
+        # start = pd.to_datetime('2023-01-01')
 
         for dr in pd.date_range(start=start, end=end, freq='QE'):
             q = f'{dr:%Y-%m-%d}'
