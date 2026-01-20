@@ -3,7 +3,7 @@ import pathlib
 import polars as pl
 import polars.selectors as cs
 from loguru import logger
-from polars_ta.utils.pit import join_quote_financial, pit_prepare, pit_frist, ANNOUNCE_DATE
+from polars_ta.utils.pit import join_quote_financial, pit_prepare, pit_frist, LOOKBACK_DATE
 
 
 def load_financial(path: str) -> pl.DataFrame:
@@ -17,12 +17,18 @@ def load_financial(path: str) -> pl.DataFrame:
     )
 
 
-def pit_calc(df: pl.DataFrame, by1: str = 'stock_code', by2: str = ANNOUNCE_DATE, by3: str = 'report_date') -> pl.DataFrame:
-    """输入PIT分组的财务数据，组内可计算时序指标"""
+def pit_calc(df: pl.DataFrame | pl.LazyFrame,
+             by1: str = 'asset',
+             by2: str = 'report_date',
+             by4: str = LOOKBACK_DATE) -> pl.DataFrame | pl.LazyFrame:
+    """输入PIT分组的财务数据，组内计算时序指标
+
+    同观察期下，同一报告期只有一条最新数据，所以没有了by3
+    """
     df1 = (
         df.with_columns(
-            # TODO 补充其他各种时序指标，注意，不要少了`( ).over(by1, by2, order_by=by3)`
-            net_profit_to_total_operate_revenue_ttm=(pl.col('net_profit').rolling_mean(4) / pl.col('total_operating_revenue').rolling_mean(4)).over(by1, by2, order_by=by3)
+            # TODO 补充其他各种时序指标，注意，不要少了`( ).over(by1, by4, order_by=by2)`
+            net_profit_to_total_operate_revenue_ttm=(pl.col('net_profit').rolling_mean(4) / pl.col('total_operating_revenue').rolling_mean(4)).over(by1, by4, order_by=by2)
         )
     )
     return df1
@@ -82,9 +88,9 @@ def main():
     # ======================================
     # Point In Time处理+时序指标计算
 
-    df = pit_prepare(df2, by1='code', by2='time', by3='statDate')
-    df = pit_calc(df, by1='code', by2=ANNOUNCE_DATE, by3='statDate')
-    df2 = pit_frist(df, by1='code', by2='time', by3='statDate', by4=ANNOUNCE_DATE)
+    df = pit_prepare(df2, by1='code', by2='statDate', by3='time', by4=LOOKBACK_DATE)
+    df = pit_calc(df, by1='code', by2='statDate', by4=LOOKBACK_DATE)
+    df2 = pit_frist(df, by1='code', by2='statDate', by3='time', by4=LOOKBACK_DATE)
     del df
 
     # ======================================
