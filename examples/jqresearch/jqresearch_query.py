@@ -158,6 +158,13 @@ def get_STK_BALANCE_SHEET(pub_date=None):
     return _get_finance_table(F, F.STK_BALANCE_SHEET, pub_date)
 
 
+def get_STK_FIN_FORCAST(pub_date=None):
+    """业绩预告"""
+    from jqdata import finance as F  # noqa
+
+    return _get_finance_table(F, F.STK_FIN_FORCAST, pub_date)
+
+
 # ===========================================
 def get_dominant_futures_all(symbols, date, end_date):
     """批量获取主力合约代码"""

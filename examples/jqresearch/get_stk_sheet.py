@@ -26,20 +26,21 @@ async def download(jqr):
         "get_STK_BALANCE_SHEET",
         "get_STK_INCOME_STATEMENT",
         "get_STK_CASHFLOW_STATEMENT",
+        "get_STK_FIN_FORCAST",
     ]:
         path = DATA_ROOT / func_name
         d = Dump__date(jqr, path, 'end_date')
         # 前半段，按周查，这样能快一些
         end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=91)
         start = pd.to_datetime(datetime.today().date()) - pd.Timedelta(days=183)
-        # start = pd.to_datetime('2023-01-01')
+        # start = pd.to_datetime('2015-01-01')
 
         for dr in pd.date_range(start=start, end=end, freq='QE'):
             q = f'{dr:%Y-%m-%d}'
             d.set_parameters(func_name,
                              end_date=dr,
                              pub_date=q)
-            if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 90):
+            if not d.exists(file_timeout=3600 * 1, data_timeout=86400 * 90):
                 # print(dr, q)
                 await d.download(use_await=True, kw=['pub_date'])
                 d.save()

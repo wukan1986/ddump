@@ -28,6 +28,7 @@ def get_paths(root):
         rf'{root}\get_STK_BALANCE_SHEET',
         rf'{root}\get_STK_CASHFLOW_STATEMENT',
         rf'{root}\get_STK_INCOME_STATEMENT',
+        rf'{root}\get_STK_FIN_FORCAST',
 
         rf'{root}\get_index_weights\000016.XSHG',
         rf'{root}\get_index_weights\000300.XSHG',
