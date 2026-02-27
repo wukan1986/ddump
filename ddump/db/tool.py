@@ -3,6 +3,7 @@
 # @Author     :wukan
 # @License    :(C) Copyright 2022
 # @Date       :2022-04-11
+from typing import Dict, Literal
 
 import pandas as pd
 from loguru import logger
@@ -31,7 +32,7 @@ class DbTool:
 
     """
 
-    def __init__(self, url, echo=False):
+    def __init__(self, url: str, echo: bool = False) -> None:
         """构造函数
 
         Parameters
@@ -78,7 +79,7 @@ class DbTool:
         """
         return self._tables
 
-    def describe(self, table_name):
+    def describe(self, table_name: str) -> pd.DataFrame:
         """显示指定表结构
 
         Parameters
@@ -95,7 +96,7 @@ class DbTool:
         columns = insp.get_columns(table_name)
         return pd.DataFrame(columns)
 
-    def run_query(self, q):
+    def run_query(self, q) -> pd.DataFrame:
         """查询结果
 
         Parameters
@@ -118,7 +119,7 @@ class DbTool:
         # self._engine.dispose()
         return pd.read_sql(q.statement, q.session.bind)
 
-    def run_update(self, q, values, auto_commit=True):
+    def run_update(self, q, values: Dict, auto_commit: bool = True):
         """更新数据，需要先查后更新
 
         Parameters
@@ -142,7 +143,7 @@ class DbTool:
 
         return count
 
-    def run_delete(self, q, auto_commit=True):
+    def run_delete(self, q, auto_commit: bool = True):
         """删除
 
         Parameters
@@ -164,7 +165,7 @@ class DbTool:
 
         return count
 
-    def insert(self, instances, auto_commit=True):
+    def insert(self, instances, auto_commit: bool = True):
         """添加记录
 
         Parameters
@@ -219,7 +220,7 @@ class DbTool:
         logger.info(sql)
         return pd.read_sql(sql, con=self._engine, **kwargs)
 
-    def to_sql(self, df, name, if_exists='append', **kwargs):
+    def to_sql(self, df: pd.DataFrame, name: str, if_exists: Literal["fail", "replace", "append"] = 'append', **kwargs):
         """将DataFrame插入到数据库
 
         TODO: 有时也很快, 需要再比较
@@ -228,14 +229,12 @@ class DbTool:
         ----------
         df: pd.DataFrame
         name: str
-        if_exists: str
+        if_exists: Literal["fail", "replace", "append"]
         kwargs:
 
         """
 
-        return df.to_sql(name, con=self._engine,
-                         if_exists=if_exists, index=False, chunksize=10000,
-                         **kwargs)
+        return df.to_sql(name, con=self._engine, if_exists=if_exists, index=False, chunksize=10000, **kwargs)
 
 
 if __name__ == '__main__':

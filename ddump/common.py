@@ -20,7 +20,7 @@ TEMP_DIR.mkdir(parents=True, exist_ok=True)
 logger.info(TEMP_DIR)
 
 
-def get_key(func_name, args, kwargs, ext):
+def get_key(func_name: str, args, kwargs, ext: str) -> pathlib.Path:
     # 将参数转换为字符串
     d = dict(func_name=func_name, args=args, kwargs=kwargs)
 
@@ -28,12 +28,12 @@ def get_key(func_name, args, kwargs, ext):
     return TEMP_DIR / (hashlib.md5(pickle.dumps(d)).hexdigest() + ext)
 
 
-def write_obj(obj, path):
+def write_obj(obj, path: pathlib.Path) -> None:
     with open(path, 'wb') as f:
         pickle.dump(obj, f)
 
 
-def read_obj(path):
+def read_obj(path: pathlib.Path):
     try:
         with open(path, 'rb') as f:
             return pickle.load(f)
@@ -41,5 +41,5 @@ def read_obj(path):
         return None
 
 
-def remove_obj(path):
+def remove_obj(path: str) -> None:
     pathlib.Path(path).unlink(missing_ok=True)

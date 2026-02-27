@@ -4,13 +4,16 @@
 2. 以其它方式命名的文件名，合并的方式需要另行处理
 
 """
+import pathlib
+from typing import List, Dict
+
 import pandas as pd
 
 from .common import start_end_2_name
 from ..common import FILE_SUFFIX, START_SEP_END
 
 
-def path_groupby_date(input_path, output_path, suffix=FILE_SUFFIX):
+def path_groupby_date(input_path: pathlib.Path, output_path: pathlib.Path, suffix: str = FILE_SUFFIX) -> List[Dict]:
     """根据文件名上所示时间进行分组
 
     文件名由 开始时间+结束时间组成

@@ -15,15 +15,16 @@
 """
 
 import pathlib
+from typing import Dict, List
 
 import pandas as pd
 
 from ..common import FILE_SUFFIX, KEY_SEP_ID
 
 
-def path_groupby_size(input_path, output_path,
-                      per_size=64 * 1024 * 1024,
-                      reserve=2, suffix=FILE_SUFFIX):
+def path_groupby_size(input_path: pathlib.Path, output_path: pathlib.Path,
+                      per_size: int = 64 * 1024 * 1024,
+                      reserve: int = 2, suffix: str = FILE_SUFFIX) -> Dict[pathlib.Path, List[pathlib.Path]]:
     """合并目录，按文件大小分。超出后才切分。
 
     合并后的文件是最后一个文件的文件名。
@@ -76,8 +77,8 @@ def path_groupby_size(input_path, output_path,
     return fss
 
 
-def path_groupby_date(input_path, output_path,
-                      reserve=2, suffix=FILE_SUFFIX):
+def path_groupby_date(input_path: pathlib.Path, output_path: pathlib.Path,
+                      reserve: int = 2, suffix: str = FILE_SUFFIX)-> List[Dict]:
     """根据日期进行合并
 
     文件由 key_id组合而成
@@ -137,12 +138,13 @@ def path_groupby_date(input_path, output_path,
     df['1M_1'] = pd.to_datetime(df['1M_1'])
     df['1Y_1'] = pd.to_datetime(df['1Y_1'])
 
+    datetime_now = datetime.now()
+
     # 最近的两个月不动，两个月前的都按月合并
-    t = f'{datetime.now() - timedelta(days=31 * 2):%Y-%m}'
-    df['key'] = df.loc[:t, '1M_1']
-    t = f'{datetime.now() - timedelta(days=365 * 1):%Y}'
-    df['key'] = df.loc[:t, '1Y_1']
-    df['key'].fillna(df['key2'], inplace=True)
+    t = f'{datetime_now - timedelta(days=31 * 2):%Y-%m}'
+    df.loc[:t, 'key'] = df.loc[:t, '1M_1']
+    t = f'{datetime_now - timedelta(days=366 + 31):%Y}'
+    df.loc[:t, 'key'] = df.loc[:t, '1Y_1']
 
     # 按key进行分组
     fss = []

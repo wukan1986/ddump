@@ -1,5 +1,7 @@
 import itertools
+import pathlib
 import shutil
+from typing import List
 
 import pandas as pd
 from loguru import logger
@@ -7,9 +9,9 @@ from loguru import logger
 from ddump.common import FILE_SUFFIX, START_SEP_END
 
 
-def merge_files_to_file(path, files,
-                        delete_src=False,
-                        single_overwrite=True):
+def merge_files_to_file(path: pathlib.Path, files: List[pathlib.Path],
+                        delete_src: bool = False,
+                        single_overwrite: bool = True):
     """合并件列表到文件
 
     Parameters
@@ -87,7 +89,7 @@ def merge_files_to_file(path, files,
     file_temp.rename(path)
 
 
-def merge_files_dict(files_dict, delete_src=False):
+def merge_files_dict(files_dict, delete_src: bool = False) -> None:
     """合并特殊字典。
 
     key为路径
@@ -110,7 +112,7 @@ def check_include(start1, end1, start2, end2):
     return 0
 
 
-def remove_sub_range(input_path, suffix=FILE_SUFFIX):
+def remove_sub_range(input_path: pathlib.Path, suffix: str = FILE_SUFFIX) -> None:
     """移除子范围"""
     files = list(input_path.glob(f'*{suffix}'))
 

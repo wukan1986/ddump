@@ -56,9 +56,9 @@ def files_to_dataframe(path, suffix=FILE_SUFFIX):
     return df
 
 
-def timeout_mtime(path, timeout):
+def timeout_mtime(path) -> float:
     """检查文件超时"""
-    return time.time() - pathlib.Path(path).stat().st_mtime > timeout
+    return time.time() - pathlib.Path(path).stat().st_mtime
 
 
 def filter_range_in_dataframe(df, start, end, file_timeout, data_timeout):

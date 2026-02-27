@@ -22,23 +22,24 @@ where (update_time='last_..' and id>'...' ) or update_time>'last_...'  order by 
 
 """
 import pathlib
+from typing import Tuple
 
 import pandas as pd
 from loguru import logger
 from sqlalchemy import or_, and_
 
 from .common import last_key_id, key_id_2_name, get_last_file_key_id, get_files_count
-from ..common import FILE_SUFFIX, TEMP_SUFFIX
 from .merge import path_groupby_size, path_groupby_date
+from ..common import FILE_SUFFIX, TEMP_SUFFIX
 from ..merge import merge_files_dict
 
 
 def dump_table(db, tbl, q=None,
-               str_key='UPDATE_TIME', str_id='ID', str_dt='UPDATE_TIME',
-               last_key=0, last_id=0, last_dt=0,
-               limit=5000,
-               page=5,
-               eq_none=False):
+               str_key: str = 'UPDATE_TIME', str_id: str = 'ID', str_dt: str = 'UPDATE_TIME',
+               last_key=0, last_id: int = 0, last_dt=0,
+               limit: int = 5000,
+               page: int = 5,
+               eq_none: bool = False) -> Tuple[pd.DataFrame, int, int]:
     """分页下载整表
 
     Parameters
@@ -121,11 +122,11 @@ def dump_table(db, tbl, q=None,
     return df, last_key, last_id
 
 
-def continue_download(db, tbl_name, path,
-                      str_key='UPDATE_TIME', str_id='ID', str_dt='UPDATE_TIME',
+def continue_download(db, tbl_name: str, path: pathlib.Path,
+                      str_key: str = 'UPDATE_TIME', str_id: str = 'ID', str_dt: str = 'UPDATE_TIME',
                       last_dt=None,
-                      limit=5000,
-                      eq_none=False):
+                      limit: int = 5000,
+                      eq_none: bool = False):
     """增量下载, 从最后一个文件之后进行下载
 
     依据 更新时间+唯一ID
@@ -296,9 +297,9 @@ def merge3(path0, path1, path2):
     """
     # 合并历史数据，方便复制
     files = path_groupby_size(path0, path0, per_size=128 * 1024 * 1024, reserve=0)
-    merge_files_dict(files, ignore_index=True, delete_src=True)
+    merge_files_dict(files, delete_src=True)
     files = path_groupby_size(path1, path1, per_size=128 * 1024 * 1024, reserve=0)
-    merge_files_dict(files, ignore_index=True, delete_src=True)
+    merge_files_dict(files, delete_src=True)
     # 每日更新部分，不能老合并，因为修改太多，网络传输量会过大，改成两个月前的都合成一个月，最近两个月的不动
     files = path_groupby_date(path2, path2, reserve=2)
-    merge_files_dict(files, ignore_index=True, delete_src=True)
+    merge_files_dict(files, delete_src=True)

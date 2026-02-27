@@ -1,9 +1,13 @@
+import pathlib
+from datetime import datetime
+from typing import Tuple
+
 import pandas as pd
 
 from ..common import FILE_SUFFIX, KEY_SEP_ID
 
 
-def last_key_id(df, str_key, str_id):
+def last_key_id(df: pd.DataFrame, str_key: str, str_id: str) -> Tuple[datetime, int]:
     """获取DataFrame中用于增量更新的两个字段最新值
 
     Parameters
@@ -23,7 +27,7 @@ def last_key_id(df, str_key, str_id):
     return last_key, last_id
 
 
-def max_key_id(df, str_key, str_id):
+def max_key_id(df: pd.DataFrame, str_key: str, str_id: str) -> Tuple[datetime, int]:
     """查找最大值，用于增量排序
 
     Parameters
@@ -38,11 +42,10 @@ def max_key_id(df, str_key, str_id):
     last_id: int
 
     """
-    return last_key_id(df.sort_values(by=[str_key, str_id]),
-                       str_key, str_id)
+    return last_key_id(df.sort_values(by=[str_key, str_id]), str_key, str_id)
 
 
-def key_id_2_name(last_key, last_id):
+def key_id_2_name(last_key, last_id: int) -> str:
     """格式化dt与id"""
     import datetime
 
@@ -53,14 +56,14 @@ def key_id_2_name(last_key, last_id):
     return f'{last_key}{KEY_SEP_ID}{last_id:020d}'
 
 
-def name_2_dt_id(name, suffix):
+def name_2_dt_id(name: str, suffix: str) -> Tuple[str, int]:
     """从文件名中获取dt和id"""
     name = name.rstrip(suffix)
     last_key, last_id = tuple(name.split(KEY_SEP_ID))
     return last_key, int(last_id)
 
 
-def get_last_file_key_id(path, suffix):
+def get_last_file_key_id(path: pathlib.Path, suffix: str) -> Tuple[str, int]:
     """通过最新文件的文件名得到关键参数
 
     Parameters
@@ -74,7 +77,7 @@ def get_last_file_key_id(path, suffix):
     id
 
     """
-    last_key, last_id = 0, 0
+    last_key, last_id = "0", 0
     files = list(path.glob(f'*{suffix}'))
     if len(files) == 0:
         return last_key, last_id

@@ -8,6 +8,7 @@ TODO: 财务表过了一段时间后可能有问题，需要特别注意
 """
 import pathlib
 import warnings
+from typing import List
 
 from loguru import logger
 
@@ -17,7 +18,7 @@ from ddump.merge import merge_files_dict, remove_sub_range
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
-def get_paths(root):
+def get_paths(root: str) -> List[str]:
     return [
         rf'{root}\get_extras_stock_is_st',
         rf'{root}\get_industry_stock',

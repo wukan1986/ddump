@@ -28,21 +28,17 @@ from ..api.common import (
 from ..common import START_SEP_END, get_key, read_obj, write_obj, remove_obj, TEMP_SUFFIX
 
 
-def func_pre_save(df, **kwargs):
+def func_pre_save(df, **kwargs) -> pd.DataFrame:
     return df
 
 
-def func_post_download(df, **kwargs):
+def func_post_download(df, **kwargs) -> pd.DataFrame:
     return df
 
 
 class Dump:
     # 单文件路径
     file_path = None
-    # 路径是否有日期
-    path_is_date = False
-    # 文件夹中的所有文件，用于判断文件是否已经存在
-    files_df = None
     # 下载的单期数据
     dfs = {}
     # 底层调用的函数名
@@ -52,7 +48,7 @@ class Dump:
     # 命名参数
     kwargs = {}
 
-    def __init__(self, api, path: str, file_names: List[str]):
+    def __init__(self, api, path: str, file_names: List[str]) -> None:
         """初始化
 
         Parameters
@@ -70,7 +66,7 @@ class Dump:
         self.file_names = file_names
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         """重置"""
         self.dfs = {}
 
@@ -100,12 +96,12 @@ class Dump:
         pass
 
     def exists(self, timeout: int) -> bool:
-        """检查文件是否存在，防止重复下载
+        """检查文件是否存在，过近的文件不再重复下载
 
         Parameters
         ----------
         timeout:int
-            超时。秒。超时的文档当做不存在，需要下载
+            超时。
 
         Returns
         -------
@@ -115,22 +111,17 @@ class Dump:
         if self.file_path is None:
             raise Exception('请在继承set_parameters时，设置self.file_path')
 
-        if self.path_is_date:
-            # 文件名中有时间，按结束时间处理
-            self.files_df = files_to_dataframe(self.path)
+        if not self.file_path.exists():
             return False
-        else:
-            # 文件名中没有时间，按文件时间处理
-            if self.file_path.exists():
-                # 文件存在，但没有设置超时
-                if timeout <= 0:
-                    return True
-                return not timeout_mtime(self.file_path, timeout)
-            else:
-                return False
+
+        if timeout <= 0:
+            return True
+
+        # 过近，不能重复下载
+        return timeout_mtime(self.file_path) < timeout
 
     @retry(wait=wait_random(10, 20), before_sleep=before_sleep_log(logger, logging.DEBUG))
-    async def download(self, use_await: bool, kw: List[str], post_download=func_post_download, post_download_kwargs={}):
+    async def download(self, use_await: bool, kw: List[str], post_download=func_post_download, post_download_kwargs={}) -> None:
         """下载动作。每个API的函数与参数不同，需定制重载
 
         Parameters
@@ -177,9 +168,9 @@ class Dump:
             df = post_download(df, **post_download_kwargs)
             self.dfs[key] = df
 
-        return self.dfs
+        # return self.dfs
 
-    def save(self, pre_save=func_pre_save, pre_save_kwargs={}):
+    def save(self, pre_save=func_pre_save, pre_save_kwargs={}) -> None:
         """保存数据
 
         Parameters
@@ -224,9 +215,8 @@ class Dump:
 
 
 class Dump__start__end(Dump):
-    path_is_date = True
 
-    def __init__(self, api, path, start_name, end_name):
+    def __init__(self, api, path: str, start_name: str, end_name: str) -> None:
         """
 
         Parameters
@@ -243,7 +233,7 @@ class Dump__start__end(Dump):
         self.start_name = start_name
         self.end_name = end_name
 
-    def set_parameters(self, func_name, **kwargs):
+    def set_parameters(self, func_name: str, *args, **kwargs) -> None:
         """设置参数
 
         Parameters
@@ -252,14 +242,14 @@ class Dump__start__end(Dump):
 
         """
         # 设置参数
-        Dump.set_parameters(self, func_name, **kwargs)
+        Dump.set_parameters(self, func_name, *args, **kwargs)
         # 生成写入文件名
         start = pd.to_datetime(self.kwargs[self.start_name])
         end = pd.to_datetime(self.kwargs[self.end_name])
         self.file_path = self.path / f'{start_end_2_name(start, end)}{FILE_SUFFIX}'
 
-    def exists(self, file_timeout, data_timeout):
-        """文件是否存在。超时的文件当做不存在
+    def exists(self, file_timeout: int, data_timeout: int) -> bool:
+        """文件是否存在。过近与过远的文件都不需要重复下载
 
         Parameters
         ----------
@@ -274,7 +264,7 @@ class Dump__start__end(Dump):
         # 检查范围是否已经下载完
         start = pd.to_datetime(self.kwargs[self.start_name])
         end = pd.to_datetime(self.kwargs[self.end_name])
-        df = filter_range_in_dataframe(self.files_df,
+        df = filter_range_in_dataframe(files_to_dataframe(self.path),
                                        start=start, end=end,
                                        file_timeout=file_timeout, data_timeout=data_timeout)
 
@@ -282,7 +272,7 @@ class Dump__start__end(Dump):
 
 
 class Dump__date(Dump__start__end):
-    def __init__(self, api, path, date_name):
+    def __init__(self, api, path: str, date_name: str) -> None:
         """一个日期的只是两个日期的特例
 
         Parameters
