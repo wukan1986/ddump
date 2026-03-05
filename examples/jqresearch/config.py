@@ -1,6 +1,6 @@
 import pathlib
 
-URL = 'http://12.34.56.78:7001:7001/api/v1/{time}'  # 适配ksrpc>=0.6.11
+URL = 'http://12.34.56.78:7001/api/v1'  # 适配ksrpc>=0.8.0
 USERNAME = 'admin'
 PASSWORD = 'password123'
 
