@@ -2,7 +2,7 @@
 以下代码必须要开启一个Notebook，获取并指定kernel_id，否则pwd=/，导致导入失败
 """
 
-from jupyter_date_fetch.codec import LazyKernel
+from jupyter_data_fetch.codec import LazyKernel
 
 
 def get_fundamentals_balance(date=None, statDate=None):

@@ -1,7 +1,7 @@
 import asyncio
 
 import pandas as pd
-from jupyter_date_fetch.codec import LazyKernel
+from jupyter_data_fetch.codec import LazyKernel
 from jupyter_kernel_client import KernelClient
 
 from ddump.api.dump import Dump__date

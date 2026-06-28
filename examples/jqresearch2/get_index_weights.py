@@ -2,7 +2,7 @@ import asyncio
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
-from jupyter_date_fetch.codec import LazyKernel
+from jupyter_data_fetch.codec import LazyKernel
 from jupyter_kernel_client import KernelClient
 
 from ddump.api.dump import Dump__date
@@ -54,7 +54,7 @@ async def async_main():
     with KernelClient(server_url=SERVER_URL, token=None, headers=HEADERS) as kernel:
         LazyKernel.set_kernel(kernel)
 
-        import jupyter_date_fetch.wraps.jqdatasdk as jqa
+        import jupyter_data_fetch.wraps.jqdatasdk as jqa
         await download(jqa)
 
 
