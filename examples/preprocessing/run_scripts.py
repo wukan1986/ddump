@@ -1,4 +1,4 @@
-from examples import jqresearch as jqr  # noqa
+from examples import jqresearch2 as jqr  # noqa
 from examples import preprocessing as prp  # noqa
 
 prp.rename_last.main()

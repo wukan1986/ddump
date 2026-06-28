@@ -1,0 +1,54 @@
+import asyncio
+from datetime import datetime
+
+import pandas as pd
+from jupyter_date_fetch.codec import LazyKernel
+from jupyter_kernel_client import KernelClient
+
+from ddump.api.dump import Dump__date
+from examples.jqresearch2.config import SERVER_URL, HEADERS, DATA_ROOT, KERNEL_ID
+
+"""
+除权除息数据下载
+
+注意，分红时间的报告期不一定是按季出现
+"""
+
+
+async def download(jqr):
+    for func_name in [
+        "get_STK_XR_XD",
+    ]:
+        path = DATA_ROOT / func_name
+        d = Dump__date(jqr, path, 'end_date')
+        # 前半段，按周查，这样能快一些
+        end = pd.to_datetime('2023-01-15')
+        start = pd.to_datetime('2023-01-01')
+        end = pd.to_datetime(datetime.today().date()) + pd.Timedelta(days=91)
+        start = pd.to_datetime(datetime.today().date()) - pd.Timedelta(days=183)
+
+        for dr in pd.date_range(start=start, end=end, freq='QE'):
+            q = f'{dr:%Y-%m-%d}'
+            d.set_parameters(func_name,
+                             end_date=dr,
+                             board_plan_pub_date=q)
+            if not d.exists(file_timeout=3600 * 6, data_timeout=86400 * 90):
+                # print(dr, q)
+                await d.download(use_await=False, kw=['board_plan_pub_date'])
+                d.save()
+
+
+async def async_main():
+    with KernelClient(server_url=SERVER_URL, token=None, headers=HEADERS, kernel_id=KERNEL_ID) as kernel:
+        LazyKernel.set_kernel(kernel)
+
+        import examples.jqresearch2.jqresearch_query_client as jqr
+        await download(jqr)
+
+
+def main():
+    asyncio.run(async_main())
+
+
+if __name__ == '__main__':
+    main()
