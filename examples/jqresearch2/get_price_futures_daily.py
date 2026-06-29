@@ -93,7 +93,7 @@ async def download(jqa, jqr):
 
 
 async def async_main():
-    with KernelClient(server_url=SERVER_URL, token=None, headers=HEADERS, kernel_id=KERNEL_ID) as kernel:
+    with KernelClient(server_url=SERVER_URL, token=None, headers=HEADERS) as kernel:
         LazyKernel.set_kernel(kernel)
 
         import jupyter_data_fetch.wraps.jqdatasdk as jqa

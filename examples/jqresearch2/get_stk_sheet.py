@@ -46,7 +46,7 @@ async def download(jqr):
 
 
 async def async_main():
-    with KernelClient(server_url=SERVER_URL, token=None, headers=HEADERS, kernel_id=KERNEL_ID) as kernel:
+    with KernelClient(server_url=SERVER_URL, token=None, headers=HEADERS) as kernel:
         LazyKernel.set_kernel(kernel)
 
         import examples.jqresearch2.jqresearch_query_client as jqr
