@@ -1,14 +1,14 @@
 import pathlib
+import re
 from http.cookies import SimpleCookie
 from pprint import pprint
 
 from jupyter_kernel_client import KernelClient
 
-SERVER_URL = "https://www.joinquant.com/user/12345678901"
-
-COOKIE = 'user-12345678901=2|1:0|10:1782612273|16:user-12345678901|48:NzA0ODFkNzItYWJkYi00Njg4LThkMDQtN2Y0M2NmODY0NGYw|52b0c3efe3112d34e67eb2728a1fd231aceb117a575d90177672553f67a847b6; uid=wKiXm2jC68o2sUDuZ0rwAg==; getStrategy=1; _xsrf=2|a0420526|3ad949c771bac9911b1012232f89763b|1782461011; token=2824ee78d21e17124b752edb6905c908b3892e78; PHPSESSID=io3t5iqtd22g6lbgfb47m6bb94'
-
+COOKIE = 'user-12345678901=2|1:0|10:1782953117|16:user-12345678901|48:NDM3YzcyMjgtMGI3Zi00N2JjLTg3N2ItZWNkMGQyN2I2NThi|b42efa665f4afabde62b13ed06e634c4d4460c125737886dc5cf2d198eee56ae; uid=wKgyrWpFsz1+TAXEuiVIAg==; token=406d04b88057c53da03f2ee40d9acdc96ce6df6e; PHPSESSID=ec5aet2nia2s0ect53a1kucma5; _xsrf=2|596e71d1|ddc54c7ec6cee0b5a79f19e0191a98a3|1782953117'
 HEADERS = {'Cookie': COOKIE, 'X-XSRFToken': SimpleCookie(COOKIE)['_xsrf'].value}
+UID = re.search(r'user-(\d+)=', COOKIE).group(1)
+SERVER_URL = f"https://www.joinquant.com/user/{UID}"
 
 DATA_ROOT = pathlib.Path(r'D:\data\jqresearch')
 DATA_ROOT_AKSHARE = pathlib.Path(r'D:\data\akshare')

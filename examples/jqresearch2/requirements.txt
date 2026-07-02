@@ -1,0 +1,4 @@
+loguru
+psutil
+playwright
+playwright_stealth
