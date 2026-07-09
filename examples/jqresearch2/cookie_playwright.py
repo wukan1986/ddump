@@ -35,7 +35,8 @@ async def capture_cookies():
             await page.get_by_role("button", name="登 录").click()
             await page.wait_for_load_state("networkidle")
 
-        await page.wait_for_timeout(5000)  # 额外等待5秒让动态内容加载
+        # 等待服务启动
+        await page.frame_locator('iframe[name="research"]').get_by_text("上传", exact=True).wait_for(timeout=30000)
 
 
 async def jupyter():
@@ -48,12 +49,7 @@ async def jupyter():
         content = f.read()
 
     # 2. 用正则替换 COOKIE 的值（保留变量名和等号，只替换引号内的值）
-    new_content = re.sub(
-        r"(COOKIE\s*=\s*)'.*?'",
-        rf"\1'{COOKIE}'",
-        content,
-        count=1  # 只替换第一个匹配项
-    )
+    new_content = re.sub(r"(COOKIE\s*=\s*)'.*?'", rf"\1'{COOKIE}'", content, count=1)
 
     # 3. 写回文件
     with open(file_path, "w", encoding="utf-8") as f:
