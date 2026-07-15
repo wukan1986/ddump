@@ -36,7 +36,7 @@ async def capture_cookies():
             await page.wait_for_load_state("networkidle")
 
         # 等待服务启动
-        await page.frame_locator('iframe[name="research"]').get_by_text("上传", exact=True).wait_for(timeout=30000)
+        await page.frame_locator('iframe[name="research"]').get_by_text("上传", exact=True).wait_for(timeout=60000)
 
 
 async def jupyter():
