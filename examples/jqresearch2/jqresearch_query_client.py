@@ -4,7 +4,7 @@
 新版，将服务端py合并到当前文件，不再关注pwd, 不用制定kernel_id，用完就释放了，减少内存占用
 """
 
-from jupyter_data_fetch.codec import LazyKernel
+from jupyter_data_fetch.codec import LazyKernel, extract_from_reply
 
 GET_FUNDAMENTALS_CODE = """
 import pandas as pd
@@ -42,7 +42,9 @@ def get_fundamentals_balance(date=None, statDate=None):
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(balance, {repr(date)}, {repr(statDate)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False)
+    return codec.decode(extract_from_reply(reply))
 
 
 def get_fundamentals_cash_flow(date=None, statDate=None):
@@ -52,7 +54,9 @@ def get_fundamentals_cash_flow(date=None, statDate=None):
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(cash_flow, {repr(date)}, {repr(statDate)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False)
+    return codec.decode(extract_from_reply(reply))
 
 
 def get_fundamentals_income(date=None, statDate=None):
@@ -62,7 +66,9 @@ def get_fundamentals_income(date=None, statDate=None):
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(income, {repr(date)}, {repr(statDate)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False)
+    return codec.decode(extract_from_reply(reply))
 
 
 def get_fundamentals_indicator(date=None, statDate=None):
@@ -72,7 +78,9 @@ def get_fundamentals_indicator(date=None, statDate=None):
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(indicator, {repr(date)}, {repr(statDate)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False)
+    return codec.decode(extract_from_reply(reply))
 
 
 def get_fundamentals_valuation(date=None, statDate=None):
@@ -82,7 +90,9 @@ def get_fundamentals_valuation(date=None, statDate=None):
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(valuation, {repr(date)}, {repr(statDate)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False)
+    return codec.decode(extract_from_reply(reply))
 
 
 # ===========================================
@@ -130,7 +140,9 @@ def get_STK_XR_XD(board_plan_pub_date=None):
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_XR_XD, {repr(board_plan_pub_date)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60)
+    return codec.decode(extract_from_reply(reply))
 
 
 def get_STK_INCOME_STATEMENT(pub_date=None):
@@ -142,7 +154,9 @@ def get_STK_INCOME_STATEMENT(pub_date=None):
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_INCOME_STATEMENT, {repr(pub_date)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60)
+    return codec.decode(extract_from_reply(reply))
 
 
 def get_STK_CASHFLOW_STATEMENT(pub_date=None):
@@ -154,7 +168,9 @@ def get_STK_CASHFLOW_STATEMENT(pub_date=None):
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_CASHFLOW_STATEMENT, {repr(pub_date)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60)
+    return codec.decode(extract_from_reply(reply))
 
 
 def get_STK_BALANCE_SHEET(pub_date=None):
@@ -166,7 +182,9 @@ def get_STK_BALANCE_SHEET(pub_date=None):
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_BALANCE_SHEET, {repr(pub_date)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60)
+    return codec.decode(extract_from_reply(reply))
 
 
 def get_STK_FIN_FORCAST(pub_date=None):
@@ -178,7 +196,9 @@ def get_STK_FIN_FORCAST(pub_date=None):
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_FIN_FORCAST, {repr(pub_date)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60)
+    return codec.decode(extract_from_reply(reply))
 
 
 # ===========================================
@@ -196,4 +216,6 @@ def _get_dominant_futures(symbols, date, end_date):
     return pd.DataFrame(df)
     
 _ = _get_dominant_futures({repr(symbols)}, {repr(date)}, {repr(end_date)})"""
-    return codec.extract_decode(kernel.execute(codec.generate_code(code, var_name='_'), store_history=False))
+    # print(code)
+    reply = kernel.execute(codec.generate_code(code, var_name='_'), store_history=False, timeout=60)
+    return codec.decode(extract_from_reply(reply))

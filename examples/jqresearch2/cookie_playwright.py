@@ -1,7 +1,7 @@
 import asyncio
 import re
 
-from playwright_helper import AsyncBrowser, get_chrome_path, kill_browsers  # noqa
+from jupyter_data_fetch.playwright_helper import AsyncBrowser, get_chrome_path, kill_browsers  # noqa
 
 USERNAME = "13912345678"
 PASSWORD = "123456"
