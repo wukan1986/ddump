@@ -2,10 +2,11 @@ import asyncio
 
 import pandas as pd
 from jupyter_data_fetch.codec import LazyKernel
+from jupyter_data_fetch.download import JoinQuantDownloader
 from jupyter_kernel_client import KernelClient
 
 from ddump.api.dump import Dump__start__end
-from examples.jqresearch2.config import SERVER_URL, HEADERS, DATA_ROOT, DATA_ROOT_AKSHARE, KERNEL_ID
+from examples.jqresearch2.config import SERVER_URL, HEADERS, DATA_ROOT, DATA_ROOT_AKSHARE, UID
 
 """
 行情数据
@@ -94,11 +95,15 @@ async def download(jqa, jqr):
 
 async def async_main():
     with KernelClient(server_url=SERVER_URL, token=None, headers=HEADERS) as kernel:
+        dl = JoinQuantDownloader(UID, HEADERS)
         LazyKernel.set_kernel(kernel)
+        LazyKernel.set_downloader(dl)
 
         import jupyter_data_fetch.wraps.jqdatasdk as jqa
         import examples.jqresearch2.jqresearch_query_client as jqr
         await download(jqa, jqr)
+
+        dl.cleanup()
 
 
 def main():
