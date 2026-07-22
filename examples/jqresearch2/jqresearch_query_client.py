@@ -3,8 +3,7 @@
 
 新版，将服务端py合并到当前文件，不再关注pwd, 不用制定kernel_id，用完就释放了，减少内存占用
 """
-
-from jupyter_data_fetch.codec import LazyKernel, extract_from_reply
+from jupyter_data_fetch import LazyDownloader
 
 GET_FUNDAMENTALS_CODE = """
 import pandas as pd
@@ -36,63 +35,58 @@ def _get_fundamentals(T, date=None, statDate=None):
 
 
 def get_fundamentals_balance(date=None, statDate=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(balance, {repr(date)}, {repr(statDate)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 def get_fundamentals_cash_flow(date=None, statDate=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(cash_flow, {repr(date)}, {repr(statDate)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 def get_fundamentals_income(date=None, statDate=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(income, {repr(date)}, {repr(statDate)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 def get_fundamentals_indicator(date=None, statDate=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(indicator, {repr(date)}, {repr(statDate)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 def get_fundamentals_valuation(date=None, statDate=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FUNDAMENTALS_CODE}
 
 _ = _get_fundamentals(valuation, {repr(date)}, {repr(statDate)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 # ===========================================
@@ -132,79 +126,72 @@ def _get_finance(F, FT, {0}=None):
 
 
 def get_STK_XR_XD(board_plan_pub_date=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FINANCE_CODE.format('board_plan_pub_date')}
 
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_XR_XD, {repr(board_plan_pub_date)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 def get_STK_INCOME_STATEMENT(pub_date=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FINANCE_CODE.format('pub_date')}
 
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_INCOME_STATEMENT, {repr(pub_date)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 def get_STK_CASHFLOW_STATEMENT(pub_date=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FINANCE_CODE.format('pub_date')}
 
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_CASHFLOW_STATEMENT, {repr(pub_date)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 def get_STK_BALANCE_SHEET(pub_date=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FINANCE_CODE.format('pub_date')}
 
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_BALANCE_SHEET, {repr(pub_date)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 def get_STK_FIN_FORCAST(pub_date=None):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 {GET_FINANCE_CODE.format('pub_date')}
 
 from jqdata import finance as F  # noqa
 
 _ = _get_finance(F, F.STK_FIN_FORCAST, {repr(pub_date)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
 
 
 # ===========================================
 def get_dominant_futures_all(symbols, date, end_date):
-    kernel = LazyKernel.get_kernel()
-    downloader = LazyKernel.get_downloader()
     code = f"""
 import pandas as pd
 from jqdata.apis import get_dominant_futures
@@ -216,6 +203,7 @@ def _get_dominant_futures(symbols, date, end_date):
     return pd.DataFrame(df)
     
 _ = _get_dominant_futures({repr(symbols)}, {repr(date)}, {repr(end_date)})"""
+    code = LazyDownloader.generate_code(code, var_name='_')
     # print(code)
-    reply = kernel.execute(downloader.generate_code(code, var_name='_'), store_history=False)
-    return downloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
+    reply = LazyDownloader.execute(code, store_history=False, timeout=60)
+    return LazyDownloader.reply_down_replace_load(reply, show_progress=True, dst=None, load=True)
