@@ -41,14 +41,14 @@ async def download(jqr):
 
 async def async_main():
     with KernelClient(server_url=SERVER_URL, token=None, headers=HEADERS) as kernel:
-        dl = JoinQuantDownloader(UID, HEADERS)
+        downloader = JoinQuantDownloader(UID, HEADERS, delete=False)
         LazyDownloader.set_kernel(kernel)
-        LazyDownloader.set_downloader(dl)
+        LazyDownloader.set_downloader(downloader)
 
         import examples.jqresearch2.jqresearch_query_client as jqr
         await download(jqr)
 
-        dl.cleanup()
+        downloader.cleanup()
 
 
 def main():

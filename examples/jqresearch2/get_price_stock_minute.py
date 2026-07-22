@@ -73,14 +73,14 @@ async def download(jqa):
 
 async def async_main():
     with KernelClient(server_url=SERVER_URL, token=None, headers=HEADERS) as kernel:
-        dl = JoinQuantDownloader(UID, HEADERS)
+        downloader = JoinQuantDownloader(UID, HEADERS, delete=False)
         LazyDownloader.set_kernel(kernel)
-        LazyDownloader.set_downloader(dl)
+        LazyDownloader.set_downloader(downloader)
 
         import jupyter_data_fetch.wraps.jqdatasdk as jqa
         await download(jqa)
 
-        dl.cleanup()
+        downloader.cleanup()
 
 
 def main():
