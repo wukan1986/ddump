@@ -77,7 +77,8 @@ def main():
     ROOT = r"F:\data\jqresearch"
 
     df2 = step1(ROOT)
-    df2 = df2.select(cs.all().shrink_dtype())
+    # df2 = df2.select(cs.all().shrink_dtype())
+    df2 = df2.select(col.shrink_dtype() for col in df2)
     df2 = df2.shrink_to_fit()
 
     logger.info('start write')
@@ -102,7 +103,8 @@ def main():
     del df1
     del df2
 
-    df3 = df3.select(cs.all().shrink_dtype())
+    # df3 = df3.select(cs.all().shrink_dtype())
+    df3 = df3.select(col.shrink_dtype() for col in df3)
     df3 = df3.shrink_to_fit()
 
     # 分成两个文件，只有最后一个文件需要上传到网络，方便同步数据

@@ -91,7 +91,8 @@ def main():
     df = step2(df)
 
     # 最后才调整大小
-    df = df.select(cs.all().shrink_dtype())
+    # df = df.select(cs.all().shrink_dtype())
+    df = df.select(col.shrink_dtype() for col in df)
     df = df.shrink_to_fit()
 
     print(df.tail())
