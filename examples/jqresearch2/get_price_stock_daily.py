@@ -36,7 +36,7 @@ async def do_get_price(d, start_date, end_date, symbols, fields, fq):
 
 
 def save_func_get_extras(df: pd.DataFrame):
-    df = df.stack(dropna=True).reset_index()
+    df = df.stack().reset_index()
     df.columns = ['time', 'code', 'is_st']
     return df[df['is_st']]
 
